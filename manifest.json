@@ -2,9 +2,9 @@
   "short_name": "LetsHunt",
   "name": "LetsHunt - Deer Hunting Weather & Baro Forecast",
   "description": "Real-time deer movement predictions based on barometric pressure trends, cold fronts, wind vectors, and solunar activity.",
-  "id": "./",
-  "start_url": "./?mode=pwa",
-  "scope": "./",
+  "id": "/LetsHunt/",
+  "start_url": "/LetsHunt/",
+  "scope": "/LetsHunt/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "fullscreen"],
   "background_color": "#020617",
@@ -12,16 +12,34 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/LetsHunt/icon-192.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/LetsHunt/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/LetsHunt/icon-512.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/LetsHunt/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/LetsHunt/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
     }
   ]
 }
