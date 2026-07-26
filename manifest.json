@@ -1,0 +1,27 @@
+{
+  "short_name": "LetsHunt",
+  "name": "LetsHunt - Deer Hunting Weather & Baro Forecast",
+  "description": "Real-time deer movement predictions based on barometric pressure trends, cold fronts, wind vectors, and solunar activity.",
+  "id": "/",
+  "start_url": "/?mode=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "fullscreen"],
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
