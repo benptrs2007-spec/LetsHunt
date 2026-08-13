@@ -7,38 +7,38 @@
   "scope": "/LetsHunt/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "fullscreen"],
-  "background_color": "#020617",
+  "background_color": "#ffffff",
   "theme_color": "#020617",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "./hunt-icon-120.png",
+      "type": "image/png",
+      "sizes": "120x120",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-192-v8.png",
       "type": "image/png",
       "sizes": "192x192",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/LetsHunt/icon-192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
+      "src": "./icon-512-v8.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/LetsHunt/icon-512.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./apple-touch-icon.png",
+      "src": "./apple-touch-icon-v8.png",
       "type": "image/png",
       "sizes": "180x180",
+      "purpose": "any"
+    },
+    {
+      "src": "./splash-logo-1024.png?v=4",
+      "type": "image/png",
+      "sizes": "1024x1024",
       "purpose": "any"
     }
   ]
