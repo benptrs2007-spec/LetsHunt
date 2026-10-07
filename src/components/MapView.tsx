@@ -1191,6 +1191,17 @@ export const MapView: React.FC<MapViewProps> = ({
   useEffect(() => {
     safeSet('letshunt_show_pins', showPins.toString());
   }, [showPins]);
+
+  // Pin name labels on the map (default off: the selected pin and hover
+  // still reveal a label; this toggle restores always-on names).
+  const [showPinLabels, setShowPinLabels] = useState(() => {
+    const saved = safeGetString('letshunt_show_pin_labels');
+    return saved ? saved === 'true' : false;
+  });
+
+  useEffect(() => {
+    safeSet('letshunt_show_pin_labels', showPinLabels.toString());
+  }, [showPinLabels]);
   const [hiddenPolygonIds, setHiddenPolygonIds] = useState<string[]>([]);
   const [hiddenPathIds, setHiddenPathIds] = useState<string[]>([]);
 
@@ -3089,7 +3100,7 @@ export const MapView: React.FC<MapViewProps> = ({
                         <Navigation className="w-4 h-4 fill-white text-sky-200" />
                       </div>
                     </div>
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 whitespace-nowrap bg-sky-950/95 text-sky-200 text-xs font-black px-2 py-0.5 rounded-md border border-sky-600 shadow-md pointer-events-none">
+                    <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-1 whitespace-nowrap bg-sky-950/95 text-sky-200 text-xs font-black px-2 py-0.5 rounded-md border border-sky-600 shadow-md pointer-events-none transition-opacity ${showPinLabels ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                       <MapPin className="w-3 h-3 inline-block mr-1 -mt-0.5" />{gpsFix ? `My GPS Location (±${Math.round(gpsFix.accuracy)} m)` : `My Location (${location.name})`}
                     </div>
                   </div>
@@ -3137,8 +3148,10 @@ export const MapView: React.FC<MapViewProps> = ({
                       <span className="text-sm"><MetaIcon icon={pinMeta.icon} fallback={Crosshair} className="w-4 h-4" /></span>
                     </div>
 
-                    {/* Pin Name Label */}
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 whitespace-nowrap bg-slate-950/90 text-white text-xs font-black px-2 py-0.5 rounded-md border border-slate-700 shadow-md pointer-events-none">
+                    {/* Pin Name Label — always visible when the Labels toggle
+                        is on or the pin is selected; otherwise it appears on
+                        hover so a busy map stays readable. */}
+                    <div className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-1 whitespace-nowrap bg-slate-950/90 text-white text-xs font-black px-2 py-0.5 rounded-md border border-slate-700 shadow-md pointer-events-none transition-opacity ${showPinLabels || isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                       {pin.name}
                     </div>
                   </div>
@@ -3150,21 +3163,41 @@ export const MapView: React.FC<MapViewProps> = ({
 
 
 
-        {/* TOP LEFT FLOATING BAR: "+ Add" Button & Location Search */}
-        <div className="absolute top-3 left-3 z-50 flex items-center gap-2 pointer-events-auto ui-control max-w-[calc(100%-140px)] flex-wrap sm:flex-nowrap" ref={searchContainerRef}>
-          {/* FLOATING "+ ADD" BUTTON WITH DROPDOWN MENU - PROMINENT & FIRST */}
-          <div className="relative">
+        {/* TOP LEFT FLOATING BAR: "+ Add" tools and location search fused
+            into one capsule — one compact control instead of three boxes. */}
+        <div className="absolute top-3 left-3 z-50 flex items-center pointer-events-auto ui-control max-w-[calc(100%-140px)]" ref={searchContainerRef}>
+          <div className={`relative flex items-stretch rounded-xl border shadow-xl backdrop-blur-md ${
+            isDark ? 'bg-slate-950/85 border-slate-800 focus-within:border-emerald-500' : 'bg-white/95 border-slate-200 focus-within:border-emerald-600'
+          }`}>
             <button
               onClick={() => {
                 setShowAddDropdown((prev) => !prev);
                 setShowLayersDropdown(false);
               }}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-400/50 hover:scale-105 active:scale-95"
+              className="pl-3 pr-2.5 py-2 rounded-l-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Add markers, zones and routes"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Add</span>
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAddDropdown ? 'rotate-180' : ''}`} />
             </button>
+            <div className={`w-px ${isDark ? 'bg-emerald-300/25' : 'bg-emerald-900/20'}`} />
+            <div className="flex items-center px-2.5 py-1.5 min-w-0">
+              <Search className={`w-3.5 h-3.5 mr-1.5 flex-shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Jump to location..."
+                className={`w-32 sm:w-48 bg-transparent text-xs focus:outline-none ${
+                  isDark ? 'text-white placeholder-slate-400' : 'text-slate-900 placeholder-slate-500'
+                }`}
+              />
+              {isSearching && (
+                <div className="w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin ml-1.5 flex-shrink-0" />
+              )}
+            </div>
 
             {/* Add Dropdown Menu */}
             {showAddDropdown && (
@@ -3229,28 +3262,6 @@ export const MapView: React.FC<MapViewProps> = ({
             )}
           </div>
 
-          {/* Location Search Input */}
-          <div
-            className={`flex items-center border rounded-xl px-3 py-1.5 transition-all shadow-xl backdrop-blur-md w-48 sm:w-60 ${
-              isDark ? 'bg-slate-950/85 border-slate-800 focus-within:border-emerald-500' : 'bg-white/95 border-slate-200 focus-within:border-emerald-600'
-            }`}
-          >
-            <Search className={`w-3.5 h-3.5 mr-2 flex-shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onFocus={() => setShowDropdown(true)}
-              placeholder="Jump to location..."
-              className={`w-full bg-transparent text-xs focus:outline-none ${
-                isDark ? 'text-white placeholder-slate-400' : 'text-slate-900 placeholder-slate-500'
-              }`}
-            />
-            {isSearching && (
-              <div className="w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin ml-2 flex-shrink-0" />
-            )}
-          </div>
-
           {/* Location Search Results Popup */}
           {showDropdown && searchResults.length > 0 && (
             <div
@@ -3280,8 +3291,13 @@ export const MapView: React.FC<MapViewProps> = ({
             </div>
           )}
 
-          {/* Best Stand for Wind Rectangular Pill Badge */}
-          {showBestWindBadge && (() => {
+        </div>
+
+        {/* BOTTOM LEFT: Best stand for the current wind — a compact chip kept
+            out of the toolbar row so the map reads calm. Hidden while a bottom
+            panel owns the screen (the hourly bar and scent panel carry the
+            same wind context). Tap it to center the map on that stand. */}
+        {showBestWindBadge && !showHourlyWeather && !selectedPin && !selectedPolygon && !selectedPath && (() => {
             const best = getBestStandForWind(windDeg);
             const matchingPin = best ? pins.find(p => p.name === best.name) : null;
             const pinMeta = matchingPin ? PIN_METADATA[matchingPin.type] || PIN_METADATA.stand : null;
@@ -3292,7 +3308,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
             return (
               <div
-                className={`px-2.5 py-1.5 rounded-xl border shadow-lg backdrop-blur-md flex items-center gap-2 text-xs font-bold transition-all ${
+                className={`absolute bottom-16 sm:bottom-4 left-4 z-30 max-w-[min(60%,320px)] px-2 py-1 rounded-xl border shadow-lg backdrop-blur-md flex items-center gap-1.5 text-xs font-bold transition-all ui-control ${
                   best
                     ? isDark
                       ? 'bg-emerald-950/95 border-emerald-500/80 text-emerald-200 shadow-emerald-950/40'
@@ -3352,7 +3368,6 @@ export const MapView: React.FC<MapViewProps> = ({
               </div>
             );
           })()}
-        </div>
 
         {/* TOP RIGHT FLOATING BAR: "Layers" Button & Dropdown Menu */}
         <div className="absolute top-3 right-3 z-[60] pointer-events-auto ui-control">
@@ -3484,6 +3499,27 @@ export const MapView: React.FC<MapViewProps> = ({
                     showPins ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400'
                   }`}>
                     {showPins ? 'ON' : 'OFF'}
+                  </span>
+                </button>
+
+                {/* Pin Name Labels Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setShowPinLabels((prev) => !prev)}
+                  className={`w-full flex items-center justify-between p-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                    showPinLabels
+                      ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-400'
+                      : isDark ? 'bg-slate-950/60 border-slate-800 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-emerald-400" />
+                    <span>Pin Name Labels</span>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-md text-xs font-black ${
+                    showPinLabels ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-slate-400'
+                  }`}>
+                    {showPinLabels ? 'ON' : 'OFF'}
                   </span>
                 </button>
 
@@ -3893,8 +3929,39 @@ export const MapView: React.FC<MapViewProps> = ({
           </div>
         )}
 
-        {/* BOTTOM RIGHT FLOATING CONTROLS: Center on GPS Location */}
-        <div className="absolute bottom-16 sm:bottom-4 right-4 z-30 pointer-events-auto flex flex-col gap-2">
+        {/* BOTTOM RIGHT FLOATING CONTROLS: Hourly weather toggle, rotation
+            reset and GPS locate — one tidy corner stack instead of controls
+            scattered along the bottom edge. */}
+        <div className="absolute bottom-16 sm:bottom-4 right-4 z-30 pointer-events-auto flex flex-col items-end gap-2">
+          {/* Hourly weather toggle — the old bottom-center pill, folded into
+              the corner stack. Opens the hourly slider; tap again to close. */}
+          {!selectedPin && !selectedPolygon && !selectedPath && (
+            <button
+              onClick={() => {
+                if (showHourlyWeather) {
+                  setShowHourlyWeather(false);
+                } else {
+                  setSelectedHour(new Date().getHours());
+                  setShowHourlyWeather(true);
+                }
+              }}
+              className={`p-2.5 rounded-2xl border shadow-xl backdrop-blur-md transition-all cursor-pointer ${
+                showHourlyWeather
+                  ? 'bg-emerald-600 border-emerald-400 text-white shadow-emerald-950/50'
+                  : isDark
+                  ? 'bg-slate-950/85 border-slate-800 text-emerald-400 hover:bg-slate-800 hover:text-white'
+                  : 'bg-white/95 border-slate-200 text-emerald-600 hover:bg-slate-50'
+              }`}
+              title="Inspect forecast wind and precipitation hour by hour"
+              aria-expanded={showHourlyWeather}
+              aria-controls="map-hourly-weather-control"
+            >
+              <span className="relative flex items-center">
+                <Clock className="w-4 h-4" />
+                <Droplets className={`w-2.5 h-2.5 absolute -right-1.5 -bottom-1 ${showHourlyWeather ? 'text-emerald-200' : 'text-sky-400'}`} />
+              </span>
+            </button>
+          )}
           {/* Rotation indicator — shows current map rotation and allows reset */}
           {rotationDisplay !== 0 && (
             <button
@@ -3933,32 +4000,6 @@ export const MapView: React.FC<MapViewProps> = ({
             )}
           </button>
         </div>
-
-        {/* HOURLY WEATHER FLOATING BUTTON (Bottom Center) */}
-        {!showHourlyWeather && !selectedPin && !selectedPolygon && !selectedPath && (
-          <div className="absolute bottom-16 sm:bottom-4 left-1/2 -translate-x-1/2 z-40 pointer-events-auto">
-            <button
-              onClick={() => {
-                setSelectedHour(new Date().getHours());
-                setShowHourlyWeather(true);
-              }}
-              className={`px-4 py-2 rounded-full border shadow-2xl backdrop-blur-md flex items-center gap-2 text-xs font-black uppercase tracking-wider transition-all cursor-pointer hover:scale-105 active:scale-95 ${
-                isDark
-                  ? 'bg-slate-950/90 border-emerald-500/50 text-emerald-300 shadow-emerald-950/50 hover:bg-slate-800'
-                  : 'bg-white/95 border-emerald-500/60 text-emerald-700 shadow-emerald-500/20 hover:bg-emerald-50'
-              }`}
-              title="Inspect forecast wind and precipitation hour by hour"
-              aria-expanded={showHourlyWeather}
-              aria-controls="map-hourly-weather-control"
-            >
-              <span className="relative flex items-center">
-                <Clock className="w-4 h-4 text-emerald-400" />
-                <Droplets className="w-2.5 h-2.5 text-sky-400 absolute -right-1.5 -bottom-1" />
-              </span>
-              <span>Hourly Weather</span>
-            </button>
-          </div>
-        )}
 
         {/* HOURLY WEATHER SLIDER (standalone): shown only while nothing is
             selected. When a pin is selected the same slider lives inside the
