@@ -41,6 +41,7 @@ import {
   ArrowRight,
   Lightbulb,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Thermometer,
 } from 'lucide-react';
@@ -497,6 +498,11 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
     ? daily[activeDayIndex + 1]
     : null;
 
+  // Previous forecast day for the hero's quick back-arrow. The forecast
+  // window always starts today, so the arrow only appears when the hero is
+  // showing a day other than today.
+  const prevDay = activeDayIndex > 0 ? daily[activeDayIndex - 1] : null;
+
   // Advance the hero — and the hourly chart, pressure graph, and wind map that
   // all follow the selected day — to the next forecast day. This drives the
   // same state as tapping a day in the Daily Hunt Score card, and "Back to
@@ -504,6 +510,14 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   const goToNextDay = () => {
     if (!nextDay) return;
     setActiveDayDate(nextDay.date);
+    setHeroHour(new Date().getHours());
+  };
+
+  // Step the hero back to the previous forecast day (the day before the one
+  // being viewed; never shown on today because the forecast starts there).
+  const goToPrevDay = () => {
+    if (!prevDay) return;
+    setActiveDayDate(prevDay.date);
     setHeroHour(new Date().getHours());
   };
 
@@ -642,8 +656,30 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
             }`}>
               <CalendarDays className="w-3 h-3" /> {dayLabel(activeDay)} · {activeDay.dateFormatted}
             </span>
-            {/* Quick-advance: peek at the next day's conditions without
-                scrolling down to the day cards. */}
+            {/* Quick-advance arrows: peek at the next day's conditions or
+                step back to an earlier day without scrolling down to the day
+                cards. Both hide when there is nothing in that direction
+                (today has no earlier forecast day; the last day has none
+                later). */}
+            {prevDay && (
+              <button
+                type="button"
+                onClick={goToPrevDay}
+                aria-label={`View the previous forecast day's conditions`}
+                title={`View the previous day's conditions`}
+                className={`shrink-0 w-6 h-6 rounded-full border inline-flex items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                  isDark
+                  ? 'bg-slate-950/60 border-slate-700 text-slate-300 hover:text-emerald-300 hover:border-emerald-500/50'
+                  : theme === 'hunting'
+                  ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#7a3208] hover:bg-[#c85a17]/10 hover:border-[#c85a17]/50'
+                  : theme === 'olive'
+                  ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#3d4f21] hover:bg-[#556b2f]/10 hover:border-[#556b2f]/50'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-400/60'
+                }`}
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+            )}
             {nextDay && (
               <button
                 type="button"

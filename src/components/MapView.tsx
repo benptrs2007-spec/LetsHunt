@@ -27,6 +27,8 @@ import {
   EyeOff,
   AlertTriangle,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ChevronUp,
   Shapes,
   Undo,
@@ -1401,6 +1403,49 @@ export const MapView: React.FC<MapViewProps> = ({
 
   const downwindDeg = (windDeg + 180) % 360;
   const downwindDirText = getWindDirectionText(downwindDeg);
+
+  // Day stepper state for the hourly sliders: step the wind animation (and all
+  // hourly stats) across forecast days. The forecast window always starts
+  // today, so "previous day" from the first day is simply disabled.
+  const stepForecastDay = (direction: -1 | 1) => {
+    setSelectedDayIndex((prev) => Math.min(activeForecasts.length - 1, Math.max(0, prev + direction)));
+  };
+  const dayNav = activeDayForecast ? {
+    label: activeDayForecast.dayName === 'Today' ? 'Today' : activeDayForecast.dayName === 'Tomorrow' ? 'Tmrw' : activeDayForecast.dayName,
+    date: activeDayForecast.dateFormatted,
+    hasPrev: selectedDayIndex > 0,
+    hasNext: selectedDayIndex < activeForecasts.length - 1,
+  } : null;
+  const dayStepper = dayNav ? (
+    <div className="flex items-center gap-0.5 flex-shrink-0">
+      <button
+        onClick={() => stepForecastDay(-1)}
+        disabled={!dayNav.hasPrev}
+        className={`p-0.5 rounded-md transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default ${
+          dayNav.hasPrev ? (isDark ? 'text-emerald-400 hover:bg-emerald-500/10' : 'text-emerald-600 hover:bg-emerald-500/10') : 'text-slate-400'
+        }`}
+        title="Previous day"
+        aria-label="Show previous forecast day"
+      >
+        <ChevronLeft className="w-3.5 h-3.5" />
+      </button>
+      <span className="text-[10px] font-black uppercase tracking-wider whitespace-nowrap">
+        {dayNav.label}
+        <span className={`hidden sm:inline ${isDark ? 'text-slate-400' : 'text-slate-500'}`}> · {dayNav.date}</span>
+      </span>
+      <button
+        onClick={() => stepForecastDay(1)}
+        disabled={!dayNav.hasNext}
+        className={`p-0.5 rounded-md transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-default ${
+          dayNav.hasNext ? (isDark ? 'text-emerald-400 hover:bg-emerald-500/10' : 'text-emerald-600 hover:bg-emerald-500/10') : 'text-slate-400'
+        }`}
+        title="Next day"
+        aria-label="Show next forecast day"
+      >
+        <ChevronRight className="w-3.5 h-3.5" />
+      </button>
+    </div>
+  ) : null;
 
   // Compute one ordered route geometry instead of merely coloring whole paths.
   // The graph is split at path crossings and pin projections, so the highlight
@@ -4018,6 +4063,7 @@ export const MapView: React.FC<MapViewProps> = ({
               }`}
             >
               <div className="flex items-center gap-1.5 sm:gap-2">
+                {dayStepper}
                 <Clock className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                 <span className="text-xs font-black whitespace-nowrap tabular-nums">
                   {selectedHour === 0 ? '12 AM' : selectedHour === 12 ? '12 PM' : selectedHour > 12 ? `${selectedHour - 12} PM` : `${selectedHour} AM`}
@@ -4207,6 +4253,7 @@ export const MapView: React.FC<MapViewProps> = ({
                       isDark ? 'border-slate-800/40 bg-slate-950/40' : 'border-slate-200 bg-slate-100/50'
                     }`}>
                       <div className="flex items-center gap-1.5 sm:gap-2">
+                        {dayStepper}
                         <Clock className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
                         <span className="text-xs font-black whitespace-nowrap tabular-nums">
                           {selectedHour === 0 ? '12 AM' : selectedHour === 12 ? '12 PM' : selectedHour > 12 ? `${selectedHour - 12} PM` : `${selectedHour} AM`}
