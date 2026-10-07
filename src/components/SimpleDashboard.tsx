@@ -41,6 +41,7 @@ import {
   ArrowRight,
   Lightbulb,
   ChevronDown,
+  ChevronRight,
   Thermometer,
 } from 'lucide-react';
 import { getRutPhase } from '../utils/rutEngine';
@@ -489,6 +490,23 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   // The day powering the hourly bar (defaults to today).
   const activeDay = daily.find((d) => d.date === activeDayDate) || today;
 
+  // Next forecast day after the one being viewed — powers the hero's quick
+  // next-day button (hidden entirely on the final day, nothing to advance to).
+  const activeDayIndex = daily.findIndex((d) => d.date === activeDay.date);
+  const nextDay = activeDayIndex >= 0 && activeDayIndex < daily.length - 1
+    ? daily[activeDayIndex + 1]
+    : null;
+
+  // Advance the hero — and the hourly chart, pressure graph, and wind map that
+  // all follow the selected day — to the next forecast day. This drives the
+  // same state as tapping a day in the Daily Hunt Score card, and "Back to
+  // Now" (in the hourly card) returns to today's live view.
+  const goToNextDay = () => {
+    if (!nextDay) return;
+    setActiveDayDate(nextDay.date);
+    setHeroHour(new Date().getHours());
+  };
+
   // The 24 bars shared by the bar chart and its aligned scrubber track.
   const hourlyBars = activeDay.hourly.slice(0, 24);
 
@@ -615,14 +633,37 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
       {/* 1. Compact hero */}
       <div className={`rounded-3xl border p-4 sm:p-5 shadow-xl relative overflow-hidden desktop-col-span-full ${cardSurface}`}>
         <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3 relative z-10">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            isDark ? 'bg-slate-950/60 border-slate-700 text-slate-200'
-            : theme === 'hunting' ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#2a1b0e]'
-            : theme === 'olive' ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#1e2e1b]'
-            : 'bg-slate-50 border-slate-200 text-slate-700'
-          }`}>
-            <CalendarDays className="w-3 h-3" /> {dayLabel(activeDay)} · {activeDay.dateFormatted}
-          </span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+              isDark ? 'bg-slate-950/60 border-slate-700 text-slate-200'
+              : theme === 'hunting' ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#2a1b0e]'
+              : theme === 'olive' ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#1e2e1b]'
+              : 'bg-slate-50 border-slate-200 text-slate-700'
+            }`}>
+              <CalendarDays className="w-3 h-3" /> {dayLabel(activeDay)} · {activeDay.dateFormatted}
+            </span>
+            {/* Quick-advance: peek at the next day's conditions without
+                scrolling down to the day cards. */}
+            {nextDay && (
+              <button
+                type="button"
+                onClick={goToNextDay}
+                aria-label={`View ${nextDay.dayName === 'Tomorrow' ? "tomorrow's" : `${nextDay.dayName}'s`} conditions`}
+                title={`View ${nextDay.dayName === 'Tomorrow' ? "tomorrow's" : `${nextDay.dayName}'s`} conditions`}
+                className={`shrink-0 w-6 h-6 rounded-full border inline-flex items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                  isDark
+                  ? 'bg-slate-950/60 border-slate-700 text-slate-300 hover:text-emerald-300 hover:border-emerald-500/50'
+                  : theme === 'hunting'
+                  ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#7a3208] hover:bg-[#c85a17]/10 hover:border-[#c85a17]/50'
+                  : theme === 'olive'
+                  ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#3d4f21] hover:bg-[#556b2f]/10 hover:border-[#556b2f]/50'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-400/60'
+                }`}
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
           <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {isLiveNow ? 'Live conditions' : `${getHour12Label(heroHour)} conditions`}
           </span>
