@@ -225,6 +225,12 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
     handleDragStart(e.clientX, e.clientY);
   };
 
+  // Touch events: leave vertical gestures to the page so scrolling over the
+  // map never pans it — `touch-pan-y` on the canvas below lets the browser own
+  // vertical swipes while horizontal ones never scroll. Only a gesture that
+  // clears a small threshold in the horizontal direction becomes a map drag.
+  // (No preventDefault here: React registers touchmove as a passive listener,
+  // so it would be a no-op — touch-action is what actually guards scrolling.)
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length !== 1) return;
     handleDragEnd();
@@ -241,7 +247,7 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
       gesture.axis = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
     }
     if (gesture.axis !== 'horizontal') return;
-    e.preventDefault();
+
     if (!isDraggingRef.current) handleDragStart(gesture.startX, gesture.startY);
     handleDragMove(touch.clientX, touch.clientY);
   };
@@ -289,6 +295,10 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
 
   return (
     <div
+      /* Scroll target for the hero card's Wind tile. Shares the `wind-plotter`
+         id with the detailed view's WindCompass — safe because the two never
+         mount at the same time (opening the detailed view unmounts this map). */
+      id="wind-plotter"
       className={`flex flex-col rounded-2xl border shadow-md transition-colors overflow-hidden ${
         isDark
           ? `${hasCustomBackground ? 'bg-slate-900/[var(--card-opacity)] backdrop-blur-xl' : 'bg-slate-900/90'} border-slate-800 text-slate-100`

@@ -447,6 +447,18 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
     };
   }, [tipOpen]);
 
+  // Autoscroll from the hero's Wind tile down to the wind plotter map card.
+  // A plain scrollIntoView would tuck the card under the sticky header, whose
+  // height varies as its contents wrap — so measure the real header and stop
+  // just short of it instead.
+  const scrollToWindMap = () => {
+    const target = document.getElementById('wind-plotter');
+    if (!target) return;
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
   const today = daily[0];
   const detailDay = daily.find((d) => d.date === detailDayDate) || null;
 
@@ -656,17 +668,25 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               </div>
             </div>
 
-            {/* Wind */}
-            <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 ${
-              isDark ? 'bg-slate-950/[var(--card-opacity)] border-slate-700/70' : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]' : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]' : 'bg-slate-50 border-slate-200'
-            }`}>
+            {/* Wind — tapping it autoscrolls down to the wind plotter map.
+                Same affordances as the detailed view's Wind tile: lift on
+                hover, sky highlight, and a small chevron hinting "down". */}
+            <button
+              type="button"
+              onClick={scrollToWindMap}
+              aria-label="Scroll down to the wind plotter map"
+              title="View the wind plotter map"
+              className={`group appearance-none text-left rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky-500/70 hover:shadow-md active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                isDark ? 'bg-slate-950/[var(--card-opacity)] border-slate-700/70' : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]' : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]' : 'bg-slate-50 border-slate-200'
+              }`}>
               <Wind className="w-7 h-7 sm:w-8 sm:h-8 text-sky-500 shrink-0" />
-              <div className="min-w-0">
-                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">Wind</div>
-                <div className="text-xs font-black truncate">{nowWindText} {nowWindSpeed} {windUnit}</div>
-                <div className="text-[10px] font-semibold opacity-60">scent blows {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</div>
-              </div>
-            </div>
+              <span className="block min-w-0">
+                <span className="block text-[10px] font-bold uppercase tracking-wider opacity-60">Wind</span>
+                <span className="block text-xs font-black truncate">{nowWindText} {nowWindSpeed} {windUnit}</span>
+                <span className="block text-[10px] font-semibold opacity-60">scent blows {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</span>
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 shrink-0 text-sky-500 opacity-70 transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+            </button>
 
             {/* Sunrise */}
             <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 ${
