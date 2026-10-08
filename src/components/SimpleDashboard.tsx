@@ -757,10 +757,13 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
                 isDark ? 'bg-slate-950/[var(--card-opacity)] border-slate-700/70' : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]' : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]' : 'bg-slate-50 border-slate-200'
               }`}>
               <Wind className="w-7 h-7 sm:w-8 sm:h-8 text-sky-500 shrink-0" />
-              <span className="block min-w-0">
+              <span className="block min-w-0 flex-1">
                 <span className="block text-[10px] font-bold uppercase tracking-wider opacity-60">Wind</span>
-                <span className="block text-xs font-black truncate">{nowWindText} {nowWindSpeed} {windUnit}</span>
-                <span className="block text-[10px] font-semibold opacity-60">scent blows {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</span>
+                {/* Direction and speed split across two compact lines so the
+                    full speed value never truncates. */}
+                <span className="block text-xs font-black truncate">{nowWindText}</span>
+                <span className="block text-xs font-black whitespace-nowrap">{nowWindSpeed} {windUnit}</span>
+                <span className="block text-[10px] font-semibold opacity-60 whitespace-nowrap">Scent: {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</span>
               </span>
               <ChevronDown className="w-3.5 h-3.5 shrink-0 text-sky-500 opacity-70 transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
             </button>
