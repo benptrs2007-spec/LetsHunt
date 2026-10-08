@@ -1018,6 +1018,9 @@ export const MapView: React.FC<MapViewProps> = ({
 
   // Drag-to-Pan & Pinch state
   const [isDragging, setIsDragging] = useState(false);
+  // Set by any manual pan/zoom so the silent auto-GPS-center on mount never
+  // yanks the map away from a view the user chose themselves.
+  const userMovedMapRef = useRef(false);
   const dragStartRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const lastTouchTimeRef = useRef<number>(0);
@@ -1339,6 +1342,34 @@ export const MapView: React.FC<MapViewProps> = ({
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
     );
   };
+
+  // Auto-center on first open: kick off a silent GPS fix as soon as the map
+  // mounts so it lands on the user's current location without them having to
+  // tap the locate button. Uses the same permission the button requests, so
+  // once granted it never asks again; if denied or unavailable, the map just
+  // stays on the forecast location as before. This only recenters when the
+  // user hasn't already panned or picked a spot themselves.
+  const hasAutoCenteredRef = useRef(false);
+  useEffect(() => {
+    if (!navigator.geolocation || hasAutoCenteredRef.current) return;
+    hasAutoCenteredRef.current = true;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setGpsFix({ lat: latitude, lng: longitude, accuracy: position.coords.accuracy || 25 });
+        if (!userMovedMapRef.current) {
+          setCenterLat(latitude);
+          setCenterLng(longitude);
+        }
+      },
+      (error) => {
+        // Silent: an auto-attempt shouldn't nag. The locate button remains
+        // the explicit path and reports failures with an alert.
+        console.info('Auto GPS center skipped:', error?.message || error);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  }, []);
 
   // Fetch pin-specific weather if selected
   useEffect(() => {
@@ -2109,6 +2140,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
     if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
       hasMovedRef.current = true;
+      userMovedMapRef.current = true;
     }
 
     // Accumulate pixel offset and apply directly to DOM for 60fps smooth panning.
@@ -2446,6 +2478,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
     if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
       hasMovedRef.current = true;
+      userMovedMapRef.current = true;
     }
 
     // Accumulate pixel offset and apply directly to DOM for 60fps smooth panning.
