@@ -140,9 +140,10 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
     const travel = Math.hypot(w, h) + margin * 2;
     const speed = Math.max(45, mph * 34); // px per second
     const dur = travel / speed;
-    // Denser stream: about twice the original density, capped so the compact
-    // card stays readable without ever dropping to zero visible droplets.
-    const count = Math.max(48, Math.min(120, Math.round((w * h) / 1500)));
+    // Denser stream: bumped again so the compact card carries a lively
+    // flow, still capped so the small overlay never hogs the compositor
+    // or drops to zero visible droplets.
+    const count = Math.max(60, Math.min(180, Math.round((w * h) / 800)));
 
     // Deterministic hash so droplet sizes/offsets stay put across slider scrubs.
     const hash = (n: number) => {

@@ -2704,9 +2704,10 @@ export const MapView: React.FC<MapViewProps> = ({
     const speed = Math.max(45, mph * 34); // px per second
     const dur = travel / speed;
     // SVG animation is the most expensive optional map overlay: each streak
-    // contains two paths and its own compositor animation. Keep the effect
-    // atmospheric without making hundreds of animated nodes compete with tiles.
-    const count = Math.max(48, Math.min(120, Math.round((w * h) / 5000)));
+    // contains two paths and its own compositor animation. Denser field than
+    // before for a richer flow, still capped so animated nodes never starve
+    // tile loading of the main thread.
+    const count = Math.max(60, Math.min(220, Math.round((w * h) / 2800)));
     // deterministic hash so streak positions stay put across slider scrubs
     const hash = (n: number) => {
       const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
