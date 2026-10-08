@@ -1070,6 +1070,9 @@ export const MapView: React.FC<MapViewProps> = ({
   const [searchResults, setSearchResults] = useState<Location[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  // Search field is collapsed to an icon by default; it only expands while
+  // in use so the toolbar never crowds the Layers button on the right edge.
+  const [showSearchBox, setShowSearchBox] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -1130,16 +1133,21 @@ export const MapView: React.FC<MapViewProps> = ({
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Click outside listener for search & dropdowns
+  // Click outside listener for search & dropdowns. Clicking elsewhere on
+  // the map also tucks the search field away again once you're done with it.
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
+        if (showSearchBox && searchQuery.trim() === '') {
+          setShowSearchBox(false);
+          setSearchResults([]);
+        }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [showSearchBox, searchQuery]);
 
   // Save pins to localStorage
   const savePinsToStorage = (updatedPins: SavedPin[]) => {
@@ -3208,8 +3216,10 @@ export const MapView: React.FC<MapViewProps> = ({
 
 
 
-        {/* TOP LEFT FLOATING BAR: "+ Add" tools and location search fused
-            into one capsule — one compact control instead of three boxes. */}
+        {/* TOP LEFT FLOATING BAR: "+ Add" tools and location search.
+            The search field stays collapsed to a compact icon so the bar
+            never crowds the Layers button on the right edge; it expands
+            only while you're actually using it. */}
         <div className="absolute top-3 left-3 z-50 flex items-center pointer-events-auto ui-control max-w-[calc(100%-140px)]" ref={searchContainerRef}>
           <div className={`relative flex items-stretch rounded-xl border shadow-xl backdrop-blur-md ${
             isDark ? 'bg-slate-950/85 border-slate-800 focus-within:border-emerald-500' : 'bg-white/95 border-slate-200 focus-within:border-emerald-600'
@@ -3227,22 +3237,53 @@ export const MapView: React.FC<MapViewProps> = ({
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showAddDropdown ? 'rotate-180' : ''}`} />
             </button>
             <div className={`w-px ${isDark ? 'bg-emerald-300/25' : 'bg-emerald-900/20'}`} />
-            <div className="flex items-center px-2.5 py-1.5 min-w-0">
-              <Search className={`w-3.5 h-3.5 mr-1.5 flex-shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setShowDropdown(true)}
-                placeholder="Jump to location..."
-                className={`w-32 sm:w-48 bg-transparent text-xs focus:outline-none ${
-                  isDark ? 'text-white placeholder-slate-400' : 'text-slate-900 placeholder-slate-500'
+            {showSearchBox ? (
+              <div className="flex items-center px-2.5 py-1.5 min-w-0">
+                <Search className={`w-3.5 h-3.5 mr-1.5 flex-shrink-0 ${isDark ? 'text-slate-400' : 'text-slate-500'}`} />
+                <input
+                  type="text"
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setShowDropdown(true)}
+                  placeholder="Jump to location..."
+                  className={`w-32 sm:w-48 bg-transparent text-xs focus:outline-none ${
+                    isDark ? 'text-white placeholder-slate-400' : 'text-slate-900 placeholder-slate-500'
+                  }`}
+                />
+                {isSearching && (
+                  <div className="w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin ml-1.5 flex-shrink-0" />
+                )}
+                <button
+                  onClick={() => {
+                    setShowSearchBox(false);
+                    setSearchQuery('');
+                    setSearchResults([]);
+                    setShowDropdown(false);
+                  }}
+                  className={`ml-1 p-0.5 rounded-md flex-shrink-0 cursor-pointer transition-colors ${
+                    isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-200'
+                  }`}
+                  title="Close search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setShowSearchBox(true);
+                  setShowAddDropdown(false);
+                  setShowLayersDropdown(false);
+                }}
+                className={`px-2.5 py-2 rounded-r-xl flex items-center transition-colors cursor-pointer ${
+                  isDark ? 'text-slate-300 hover:text-white hover:bg-slate-800' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                 }`}
-              />
-              {isSearching && (
-                <div className="w-3.5 h-3.5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin ml-1.5 flex-shrink-0" />
-              )}
-            </div>
+                title="Jump to location"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Add Dropdown Menu */}
             {showAddDropdown && (
@@ -3308,7 +3349,7 @@ export const MapView: React.FC<MapViewProps> = ({
           </div>
 
           {/* Location Search Results Popup */}
-          {showDropdown && searchResults.length > 0 && (
+          {showSearchBox && showDropdown && searchResults.length > 0 && (
             <div
               className={`absolute top-full left-12 mt-1.5 w-60 border rounded-xl shadow-2xl overflow-hidden z-40 max-h-60 overflow-y-auto divide-y ${
                 isDark ? 'bg-slate-900 border-slate-700 divide-slate-800 text-slate-200' : 'bg-white border-slate-200 divide-slate-100 text-slate-800'
@@ -3322,6 +3363,8 @@ export const MapView: React.FC<MapViewProps> = ({
                     setCenterLng(loc.longitude);
                     setShowDropdown(false);
                     setSearchQuery('');
+                    setShowSearchBox(false);
+                    setSearchResults([]);
                     if (onSelectLocation) onSelectLocation(loc);
                   }}
                   className={`w-full text-left px-3 py-2 transition-colors flex items-center justify-between text-xs cursor-pointer ${
