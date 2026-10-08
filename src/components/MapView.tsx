@@ -1075,6 +1075,21 @@ export const MapView: React.FC<MapViewProps> = ({
   const [showSearchBox, setShowSearchBox] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
+  // Wind droplets only animate while the map itself is on screen. Freezing
+  // via animationPlayState keeps every droplet mid-flight, so returning to
+  // the map resumes the flow instantly instead of restarting it.
+  const [isMapVisible, setIsMapVisible] = useState(true);
+  useEffect(() => {
+    const el = mapContainerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsMapVisible(entry.isIntersecting),
+      { rootMargin: '120px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     return () => {
       if (panTileRefreshRafRef.current !== null) cancelAnimationFrame(panTileRefreshRafRef.current);
@@ -2704,10 +2719,10 @@ export const MapView: React.FC<MapViewProps> = ({
     const speed = Math.max(45, mph * 34); // px per second
     const dur = travel / speed;
     // SVG animation is the most expensive optional map overlay: each streak
-    // contains two paths and its own compositor animation. Denser field than
-    // before for a richer flow, still capped so animated nodes never starve
-    // tile loading of the main thread.
-    const count = Math.max(60, Math.min(220, Math.round((w * h) / 2800)));
+    // contains two paths and its own compositor animation. A steady, uniform
+    // field — denser than the original but well under the previous maximum
+    // that caused scroll lag — with a floor so the map never looks empty.
+    const count = Math.max(48, Math.min(110, Math.round((w * h) / 6000)));
     // deterministic hash so streak positions stay put across slider scrubs
     const hash = (n: number) => {
       const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -3070,7 +3085,20 @@ export const MapView: React.FC<MapViewProps> = ({
                     key={`wind-streak-${i}`}
                     transform={`translate(${s.x} ${s.y}) rotate(${downwindDeg - 90})`}
                   >
-                    <g opacity={Math.min(0.7, s.opacity + 0.12)} style={{ animation: `windFlow ${s.dur}s linear infinite`, animationDelay: `${s.delay}s`, animationFillMode: 'backwards', ...({ '--travel': `${s.travel}px` } as Record<string, string>) }}>
+                    <g
+                      opacity={Math.min(0.7, s.opacity + 0.12)}
+                      style={{
+                        animation: `windFlow ${s.dur}s linear infinite`,
+                        animationDelay: `${s.delay}s`,
+                        animationFillMode: 'backwards',
+                        // Droplets freeze mid-flight whenever the map is
+                        // covered by another app view (the overlay unmounts
+                        // with this SVG), so returning to the map resumes
+                        // instantly without a visible restart.
+                        animationPlayState: isMapVisible ? 'running' : 'paused',
+                        ...({ '--travel': `${s.travel}px` } as Record<string, string>),
+                      }}
+                    >
                       {/* Elongated droplet: rounded head leads downwind, tail tapers behind. The
                           near-white body reads as an icy streak; the darker underlay is softened
                           to a subtle rim so the droplets stay visible over bright map tiles too. */}

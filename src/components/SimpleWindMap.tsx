@@ -3,6 +3,31 @@ import { HourlyForecast, Location, UnitSystem, ThemeVariantMode } from '../types
 import { Wind, ZoomIn, ZoomOut, RotateCcw, MapPin, Navigation, CalendarDays } from 'lucide-react';
 import { getHour12Label } from '../utils/huntingEngine';
 
+// Shared hook: pauses this component's CSS animations when it scrolls out of
+// the viewport and resumes them (instantly, mid-flight) when it returns.
+// Pausing via animationPlayState keeps every droplet exactly where it was, so
+// re-entering the viewport continues the flow rather than restarting it — and
+// an offscreen card costs zero compositor work. A small rootMargin pre-roll
+// starts the animation just before the card edge appears so it never pops in
+// frozen.
+const useViewportAnimationPause = <T extends HTMLElement>() => {
+  const ref = useRef<T | null>(null);
+  const [isOnScreen, setIsOnScreen] = useState(true);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return; // older browsers: animation just runs always
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsOnScreen(entry.isIntersecting),
+      { rootMargin: '120px 0px' }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, isOnScreen };
+};
+
 interface SimpleWindMapProps {
   location: Location;
   hourly: HourlyForecast[];
@@ -75,6 +100,8 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
   }, [hourly]);
 
   const [zoom, setZoom] = useState(15);
+  // Wind droplets only animate while the map card is on screen.
+  const { ref: viewportRef, isOnScreen: isMapOnScreen } = useViewportAnimationPause<HTMLDivElement>();
   const defaultLat = location?.latitude ?? 39.8283;
   const defaultLng = location?.longitude ?? -98.5795;
   const [centerLat, setCenterLat] = useState(defaultLat);
@@ -140,10 +167,10 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
     const travel = Math.hypot(w, h) + margin * 2;
     const speed = Math.max(45, mph * 34); // px per second
     const dur = travel / speed;
-    // Denser stream: bumped again so the compact card carries a lively
-    // flow, still capped so the small overlay never hogs the compositor
-    // or drops to zero visible droplets.
-    const count = Math.max(60, Math.min(180, Math.round((w * h) / 800)));
+    // Steady, uniform stream: fewer droplets than the previous maximum (the
+    // denser field caused measurable lag while scrolling), but with a floor
+    // that keeps the card visibly alive even on small screens.
+    const count = Math.max(40, Math.min(90, Math.round((w * h) / 1800)));
 
     // Deterministic hash so droplet sizes/offsets stay put across slider scrubs.
     const hash = (n: number) => {
@@ -346,7 +373,7 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
 
       {/* Map canvas */}
       <div
-        ref={mapContainerRef}
+        ref={(el) => { mapContainerRef.current = el; viewportRef.current = el; }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleDragMove}
         onMouseUp={handleDragEnd}
@@ -389,6 +416,9 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
                     animation: `windFlow ${s.dur}s linear infinite`,
                     animationDelay: `${s.delay}s`,
                     animationFillMode: 'backwards',
+                    // Freeze the droplets mid-flight while the card is scrolled
+                    // away; resuming picks up exactly where each one left off.
+                    animationPlayState: isMapOnScreen ? 'running' : 'paused',
                     ...({ '--travel': `${s.travel}px` } as Record<string, string>),
                   }}
                 >
