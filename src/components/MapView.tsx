@@ -4033,7 +4033,7 @@ export const MapView: React.FC<MapViewProps> = ({
                   setShowHourlyWeather(true);
                 }
               }}
-              className={`p-2.5 rounded-2xl border shadow-xl backdrop-blur-md transition-all cursor-pointer ${
+              className={`p-2.5 rounded-2xl border shadow-xl backdrop-blur-md transition-all cursor-pointer flex items-center gap-1.5 ${
                 showHourlyWeather
                   ? 'bg-emerald-600 border-emerald-400 text-white shadow-emerald-950/50'
                   : isDark
@@ -4048,6 +4048,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 <Clock className="w-4 h-4" />
                 <Droplets className={`w-2.5 h-2.5 absolute -right-1.5 -bottom-1 ${showHourlyWeather ? 'text-emerald-200' : 'text-sky-400'}`} />
               </span>
+              <span className="text-[10px] font-black uppercase tracking-wider leading-none">Weather</span>
             </button>
           )}
           {/* Rotation indicator — shows current map rotation and allows reset */}
@@ -4166,33 +4167,32 @@ export const MapView: React.FC<MapViewProps> = ({
               isDark ? 'bg-slate-950/95 border-slate-800 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
             }`}
           >
-            {/* Header Bar */}
-            <div className="flex items-center justify-between p-2 border-b border-slate-800/30 bg-slate-950/20">
-              <div className="flex items-center gap-2 overflow-hidden">
-                <span className="text-xl flex-shrink-0 flex items-center"><MetaIcon icon={PIN_METADATA[selectedPin.type]?.icon} fallback={Crosshair} className="w-5 h-5" /></span>
-                <div className="truncate">
-                  <h4 className="text-xs font-black truncate">{selectedPin.name}</h4>
-                  <span className="text-xs text-emerald-400 font-bold block truncate">
-                    {PIN_METADATA[selectedPin.type]?.label} • Wind: {windDirText} @ {displayWindSpeed}
-                  </span>
-                </div>
-              </div>
+            {/* Header Bar — single tight row: icon, name, type/wind pill,
+                then the actions. Saves a full line of vertical space. */}
+            <div className="flex items-center gap-2 p-2 border-b border-slate-800/30 bg-slate-950/20">
+              <span className="text-xl flex-shrink-0 flex items-center"><MetaIcon icon={PIN_METADATA[selectedPin.type]?.icon} fallback={Crosshair} className="w-5 h-5" /></span>
+              <h4 className="text-xs font-black truncate flex-shrink">{selectedPin.name}</h4>
+              <span className={`hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wide whitespace-nowrap flex-shrink-0 ${
+                isDark ? 'bg-slate-800/70 text-emerald-300' : 'bg-emerald-500/10 text-emerald-700'
+              }`}>
+                {PIN_METADATA[selectedPin.type]?.label}
+              </span>
+              <span className={`hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wide whitespace-nowrap flex-shrink-0 ${
+                isDark ? 'bg-slate-800/70 text-sky-300' : 'bg-sky-500/10 text-sky-700'
+              }`}>
+                <Wind className="w-2.5 h-2.5" />{windDirText} {displayWindSpeed}
+              </span>
 
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-auto">
                 <button
                   onClick={() => setIsScentPanelCollapsed((prev) => !prev)}
-                  className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1.5 px-2.5 cursor-pointer transition-colors"
+                  className="p-2 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-300 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                  title={isScentPanelCollapsed ? 'Expand panel' : 'Collapse panel'}
                 >
                   {isScentPanelCollapsed ? (
-                    <>
-                      <span>Expand</span>
-                      <ChevronUp className="w-3.5 h-3.5" />
-                    </>
+                    <ChevronUp className="w-3.5 h-3.5" />
                   ) : (
-                    <>
-                      <span>Collapse</span>
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </>
+                    <ChevronDown className="w-3.5 h-3.5" />
                   )}
                 </button>
                 <button
@@ -4268,7 +4268,7 @@ export const MapView: React.FC<MapViewProps> = ({
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5" />
-                    <span>Hourly Scent</span>
+                    <span>Hourly</span>
                   </button>
 
 
@@ -4282,7 +4282,7 @@ export const MapView: React.FC<MapViewProps> = ({
                     }`}
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>Details & Notes</span>
+                    <span>Details</span>
                   </button>
                 </div>
 
@@ -4325,18 +4325,18 @@ export const MapView: React.FC<MapViewProps> = ({
                         <span className="text-slate-500">·</span>
                         <span className="inline-flex items-center gap-0.5 text-sky-400"><Droplets className="w-2.5 h-2.5" />{precipProbability}% · {displayPrecipAmount}</span>
                         <span className="text-slate-500">·</span>
-                        <span className={`inline-flex items-center gap-0.5 ${currentHourForecast?.isPrimeWindow ? 'text-amber-500' : 'text-slate-400'}`}>
-                          <Sparkles className="w-2.5 h-2.5" />
-                          {currentHourForecast?.isPrimeWindow ? 'Best movement window' : `${currentHourForecast?.temp ?? '--'}°`}
-                        </span>
+                        <span className="inline-flex items-center gap-0.5 text-amber-500"><Sparkles className="w-2.5 h-2.5" />{currentHourForecast?.temp ?? '--'}°</span>
+                        {currentHourForecast?.isPrimeWindow && (
+                          <span className="inline-flex items-center gap-0.5 text-amber-500">
+                            · Best movement window
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 )}
 
-
-
-                {/* TAB 3: Marker Details & Notes */}
+                {/* TAB 2: Marker Details & Notes */}
                 {activeForecasterTab === 'details' && (
                   <div className="space-y-1.5">
                     <div className={`p-2 rounded-xl border space-y-1 text-xs ${
