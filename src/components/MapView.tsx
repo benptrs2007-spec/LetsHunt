@@ -3282,7 +3282,7 @@ export const MapView: React.FC<MapViewProps> = ({
             The search field stays collapsed to a compact icon so the bar
             never crowds the Layers button on the right edge; it expands
             only while you're actually using it. */}
-        <div className="absolute top-3 left-3 z-50 flex items-center pointer-events-auto ui-control max-w-[calc(100%-140px)]" ref={searchContainerRef}>
+        <div className="absolute top-3 left-3 z-50 flex items-center pointer-events-auto ui-control max-w-[calc(100%-130px)]" ref={searchContainerRef}>
           <div className={`relative flex items-stretch rounded-xl border shadow-xl backdrop-blur-md ${
             isDark ? 'bg-slate-950/85 border-slate-800 focus-within:border-emerald-500' : 'bg-white/95 border-slate-200 focus-within:border-emerald-600'
           }`}>
@@ -3413,7 +3413,7 @@ export const MapView: React.FC<MapViewProps> = ({
           {/* Location Search Results Popup */}
           {showSearchBox && showDropdown && searchResults.length > 0 && (
             <div
-              className={`absolute top-full left-12 mt-1.5 w-60 border rounded-xl shadow-2xl overflow-hidden z-40 max-h-60 overflow-y-auto divide-y ${
+              className={`absolute top-full left-0 mt-1.5 w-56 sm:w-60 border rounded-xl shadow-2xl overflow-hidden z-40 max-h-60 overflow-y-auto divide-y ${
                 isDark ? 'bg-slate-900 border-slate-700 divide-slate-800 text-slate-200' : 'bg-white border-slate-200 divide-slate-100 text-slate-800'
               }`}
             >
@@ -3526,19 +3526,22 @@ export const MapView: React.FC<MapViewProps> = ({
               setShowLayersDropdown((prev) => !prev);
               setShowAddDropdown(false);
             }}
-            className={`px-3 py-1.5 rounded-xl border shadow-xl flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider backdrop-blur-md transition-all cursor-pointer ${
+            className={`px-2 py-1.5 rounded-xl border shadow-xl flex items-center gap-1 text-xs font-extrabold uppercase tracking-wider backdrop-blur-md transition-all cursor-pointer ${
               showLayersDropdown
                 ? 'bg-emerald-600 text-white border-emerald-400'
                 : isDark
                 ? 'bg-slate-950/85 border-slate-800 text-slate-200 hover:text-white hover:bg-slate-800'
                 : 'bg-white/95 border-slate-200 text-slate-800 hover:bg-slate-50'
             }`}
+            title="Map layers & saved items"
           >
-            <Layers className="w-4 h-4 text-emerald-400" />
+            <Layers className="w-3.5 h-3.5 text-emerald-400" />
             <span>Layers</span>
-            <span className="ml-1 px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded-md text-xs font-black">
-              {pins.length + polygons.length + paths.length}
-            </span>
+            {pins.length + polygons.length + paths.length > 0 && (
+              <span className="ml-0.5 px-1 py-0 bg-emerald-500/20 text-emerald-300 rounded text-[9px] font-black leading-none">
+                {pins.length + polygons.length + paths.length}
+              </span>
+            )}
           </button>
 
           {/* FLOATING LAYERS & MARKERS DROPDOWN POPOVER */}
