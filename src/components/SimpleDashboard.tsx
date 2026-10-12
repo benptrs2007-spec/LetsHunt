@@ -521,6 +521,23 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
     setHeroHour(new Date().getHours());
   };
 
+  // Keep the pressure chart's source hours continuous across midnight. Supply
+  // all remaining forecast days so its 12-hour window can roll past today's
+  // final hour, even when the selected day is near the end of the forecast.
+  const pressureChartDays = daily.slice(Math.max(0, activeDayIndex));
+  const pressureChartHourly = pressureChartDays.flatMap((day) => day.hourly || []);
+  const selectPressureChartHour = (hourIndex: number) => {
+    let remainingIndex = hourIndex;
+    for (const day of pressureChartDays) {
+      if (remainingIndex < day.hourly.length) {
+        if (day.date !== activeDay.date) setActiveDayDate(day.date);
+        setHeroHour(remainingIndex);
+        return;
+      }
+      remainingIndex -= day.hourly.length;
+    }
+  };
+
   // The 24 bars shared by the bar chart and its aligned scrubber track.
   const hourlyBars = activeDay.hourly.slice(0, 24);
 
@@ -532,6 +549,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   // hour so the advice matches exactly what's on screen.
   const activeTips = buildDailyTip(activeDay, units, location, heroHourData, heroHour);
   const isLiveNow = activeDay.date === today.date && heroHour === currentLocalHour;
+  const isNextForecastDayHour = activeDay.date !== today.date;
   const heroScore = heroHourData ? heroHourData.huntScore : activeDay.huntScore;
   const heroRating = getRatingFromScore(heroScore);
   // The hero progress bar uses the exact same scoring shades as the hourly
@@ -701,7 +719,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
             )}
           </div>
           <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {isLiveNow ? 'Live conditions' : `${getHour12Label(heroHour)} conditions`}
+            {isLiveNow ? 'Live conditions' : `${isNextForecastDayHour ? `${activeDay.dayName} · ` : ''}${getHour12Label(heroHour)} conditions`}
           </span>
         </div>
         {/* Score progress bar (compact, replaces the dial) */}
@@ -739,7 +757,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
             }`}>
               {getWeatherIcon(nowDetails.icon, 'w-8 h-8 sm:w-9 sm:h-9 text-amber-500 shrink-0')}
               <div className="min-w-0">
-                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">{isLiveNow ? 'Now' : getHour12Label(heroHour)}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">{isLiveNow ? 'Now' : `${isNextForecastDayHour ? `${activeDay.dayName} · ` : ''}${getHour12Label(heroHour)}`}</div>
                 <div className="text-xs font-black truncate">{nowDesc}</div>
                 <div className="text-xs font-extrabold">{nowTemp}{tempUnit}</div>
               </div>
@@ -936,7 +954,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               onChange={(e) => setHeroHour(parseInt(e.target.value, 10))}
               aria-label="Hourly hunt score slider"
               aria-valuetext={`${getHour12Label(heroHour)} — hunt score ${heroScore}, ${getRatingFromScore(heroScore)}`}
-              className="absolute inset-0 w-full h-full appearance-none opacity-0 cursor-pointer z-20"
+              className="absolute inset-0 w-full h-full appearance-none opacity-0 cursor-pointer z-20 touch-none"
             />
           </div>
         </div>
@@ -1135,16 +1153,16 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
 
       {/* 4. Selected day pressure + precipitation */}
       <PressureChart
-        hourly={activeDay.hourly}
+        hourly={pressureChartHourly}
         units={units}
         pressureUnit={pressureUnit}
         theme={theme}
         isDark={isDark}
         hasCustomBackground={hasCustomBackground}
         selectedHour={heroHour}
-        onSelectHour={setHeroHour}
-        selectedDayName={activeDay.dayName}
-        selectedDateFormatted={activeDay.dateFormatted}
+        onSelectHour={selectPressureChartHour}
+        selectedDayName={isNextForecastDayHour ? activeDay.dayName : undefined}
+        selectedDateFormatted={isNextForecastDayHour ? activeDay.dateFormatted : undefined}
       />
 
       {/* 5. Satellite wind map with scent cone, following the selected day + hour */}
