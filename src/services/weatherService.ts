@@ -45,28 +45,17 @@ function getLocalHour(time: string): number | null {
   return hour >= 0 && hour <= 23 ? hour : null;
 }
 
-/** UTC offset (ms) of an IANA timezone at a given instant, DST-aware. */
-function getZoneOffsetMs(instantMs: number, timezone: string): number {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone,
-    hourCycle: 'h23',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).formatToParts(new Date(instantMs));
-  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
-  const asUtc = Date.UTC(get('year'), get('month') - 1, get('day'), get('hour'), get('minute'), get('second'));
-  return asUtc - Math.floor(instantMs / 1000) * 1000;
-}
-
-/** Convert an Open-Meteo local timestamp (which uses one fixed UTC offset for
- * the whole response) into the instant it represents. Formatting that instant
- * in the response's IANA timezone then applies any DST change on the forecast
- * date instead of incorrectly reusing today's offset. */
-function parseOpenMeteoLocalTime(value: string, utcOffsetSeconds: number, timezone?: string): Date {
+/** Convert an Open-Meteo local timestamp into the instant it represents.
+ *
+ * With `timezone=auto`, Open-Meteo labels every timestamp in a response with
+ * the single `utc_offset_seconds` it reports — the offset in effect when the
+ * request was made, not the offset in effect on each forecast date. A 14-day
+ * forecast spans a DST change with the pre-change offset still applied, so the
+ * sunrise/sunset strings after the change are an hour off the local clock.
+ * Subtracting that fixed offset recovers the true instant; formatting it in the
+ * location's IANA timezone then shows the correct local time for that date in
+ * any region (Canada, US, Europe, Australia, …). */
+function parseOpenMeteoLocalTime(value: string, utcOffsetSeconds: number): Date {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
   if (!match || !Number.isFinite(utcOffsetSeconds)) return new Date(value);
 
@@ -74,17 +63,6 @@ function parseOpenMeteoLocalTime(value: string, utcOffsetSeconds: number, timezo
   const localAsUtc = Date.UTC(
     Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second),
   );
-  // Use the zone's real offset on that specific date (handles DST before/after
-  // a change). Two passes settle the offset when the guess crosses a transition.
-  if (timezone) {
-    try {
-      const first = getZoneOffsetMs(localAsUtc, timezone);
-      const second = getZoneOffsetMs(localAsUtc - first, timezone);
-      return new Date(localAsUtc - second);
-    } catch {
-      // Unknown timezone name: fall back to the response's fixed offset below.
-    }
-  }
   return new Date(localAsUtc - utcOffsetSeconds * 1000);
 }
 
@@ -350,8 +328,8 @@ export async function fetch5DayHuntingForecast(
     const sunsetStr = dailyRaw.sunset[d];
     const utcOffsetSeconds = rawData.utc_offset_seconds;
     const timezone = rawData.timezone;
-    const sunriseDate = sunriseStr ? parseOpenMeteoLocalTime(sunriseStr, utcOffsetSeconds, timezone) : null;
-    const sunsetDate = sunsetStr ? parseOpenMeteoLocalTime(sunsetStr, utcOffsetSeconds, timezone) : null;
+    const sunriseDate = sunriseStr ? parseOpenMeteoLocalTime(sunriseStr, utcOffsetSeconds) : null;
+    const sunsetDate = sunsetStr ? parseOpenMeteoLocalTime(sunsetStr, utcOffsetSeconds) : null;
 
     // Safe defensive extraction of hourly arrays to prevent TypeError if API response omits keys
     const timeArr = hourlyRaw.time || [];
@@ -458,7 +436,7 @@ export async function fetch5DayHuntingForecast(
     // window is a perfect 62°F, and rain at 2 PM shouldn't hide the fact
     // that the prime windows are also wet.
     const primeHourIndices = dayHourlyRaw.time
-      .map((time: string, idx: number) => ({ timestamp: parseOpenMeteoLocalTime(time, utcOffsetSeconds, timezone).getTime(), idx }))
+      .map((time: string, idx: number) => ({ timestamp: parseOpenMeteoLocalTime(time, utcOffsetSeconds).getTime(), idx }))
       .filter(({ timestamp }) => isPrimeTimestamp(timestamp))
       .map(({ idx }) => idx);
 
@@ -596,7 +574,7 @@ export async function fetch5DayHuntingForecast(
 
     // Build hourly list for day
     const hourlyForecasts: HourlyForecast[] = dayHourlyRaw.time.map((tStr: string, idx: number) => {
-      const hDate = parseOpenMeteoLocalTime(tStr, utcOffsetSeconds, timezone);
+      const hDate = parseOpenMeteoLocalTime(tStr, utcOffsetSeconds);
       const hour = getLocalHour(tStr) ?? hDate.getHours();
       const hTempC = dayHourlyRaw.temp[idx];
       const hTempF = celsiusToFahrenheit(hTempC);
