@@ -45,10 +45,6 @@ function getLocalHour(time: string): number | null {
   return hour >= 0 && hour <= 23 ? hour : null;
 }
 
-/** Convert an Open-Meteo local timestamp (which uses one fixed UTC offset for
- * the whole response) into the instant it represents. Formatting that instant
- * in the response's IANA timezone then applies any DST change on the forecast
- * date instead of incorrectly reusing today's offset. */
 /** UTC offset (ms) of an IANA timezone at a given instant, DST-aware. */
 function getZoneOffsetMs(instantMs: number, timezone: string): number {
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -66,6 +62,10 @@ function getZoneOffsetMs(instantMs: number, timezone: string): number {
   return asUtc - Math.floor(instantMs / 1000) * 1000;
 }
 
+/** Convert an Open-Meteo local timestamp (which uses one fixed UTC offset for
+ * the whole response) into the instant it represents. Formatting that instant
+ * in the response's IANA timezone then applies any DST change on the forecast
+ * date instead of incorrectly reusing today's offset. */
 function parseOpenMeteoLocalTime(value: string, utcOffsetSeconds: number, timezone?: string): Date {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
   if (!match || !Number.isFinite(utcOffsetSeconds)) return new Date(value);
