@@ -78,6 +78,19 @@ export function format12HourTime(dateInput: Date | string): string {
   return `${hours}:${minutesStr} ${ampm}`;
 }
 
+function formatTimeInTimezone(dateInput: Date | string, timezone?: string): string {
+  const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) return typeof dateInput === 'string' ? dateInput : '12:00 AM';
+  if (!timezone) return format12HourTime(date);
+
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(date);
+}
+
 export function getHour12Label(hour: number): string {
   const ampm = hour >= 12 ? 'PM' : 'AM';
   const displayHour = hour % 12 === 0 ? 12 : hour % 12;
@@ -271,12 +284,20 @@ function toWindowMs(start: Date | null, end: Date | null): { start: number; end:
  * astronomy library throws, so solunar never disappears from the
  * dashboard.
  */
-export function calculateSolunar(dateStr: string, lat: number, lon: number, sunriseStr: string, sunsetStr: string): SolunarInfo {
+export function calculateSolunar(
+  dateStr: string,
+  lat: number,
+  lon: number,
+  sunriseStr: string,
+  sunsetStr: string,
+  timezone?: string,
+): SolunarInfo {
   const date = new Date(dateStr);
 
-  // Parse sunrise & sunset
-  const sunriseTime = sunriseStr ? format12HourTime(sunriseStr) : '6:30 AM';
-  const sunsetTime = sunsetStr ? format12HourTime(sunsetStr) : '6:45 PM';
+  // Sunrise/sunset arrive as absolute instants after accounting for the API's
+  // fixed offset; format them in the location's IANA zone for date-specific DST.
+  const sunriseTime = sunriseStr ? formatTimeInTimezone(sunriseStr, timezone) : '6:30 AM';
+  const sunsetTime = sunsetStr ? formatTimeInTimezone(sunsetStr, timezone) : '6:45 PM';
 
   // --- Real astronomy (preferred path) ---
   const moonTimes = calculateMoonTimes(date, lat, lon);
