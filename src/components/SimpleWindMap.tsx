@@ -248,9 +248,20 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
     setIsDragging(false);
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button !== 0) return;
+  // Capture mouse drags so panning continues even if the pointer reaches an
+  // edge of the small embedded map. Touch gestures retain the axis-aware
+  // handlers below so vertical swipes still scroll the dashboard.
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    if (e.target instanceof Element && e.target.closest('button')) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
     handleDragStart(e.clientX, e.clientY);
+  };
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse') handleDragMove(e.clientX, e.clientY);
+  };
+  const handlePointerEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'mouse') handleDragEnd();
   };
 
   // Touch events: leave vertical gestures to the page so scrolling over the
@@ -314,6 +325,7 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
   const handleReset = () => {
     setCenterLat(defaultLat);
     setCenterLng(defaultLng);
+    setZoom(15);
   };
 
   const speedVal = units === 'metric'
@@ -374,10 +386,10 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
       {/* Map canvas */}
       <div
         ref={(el) => { mapContainerRef.current = el; viewportRef.current = el; }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleDragMove}
-        onMouseUp={handleDragEnd}
-        onMouseLeave={handleDragEnd}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerEnd}
+        onPointerCancel={handlePointerEnd}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -450,23 +462,31 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
         {/* Zoom / reset controls */}
         <div className="absolute bottom-2.5 right-2.5 z-30 flex flex-col gap-1.5">
           <button
+            type="button"
             onClick={handleZoomIn}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
-            title="Zoom In"
+            disabled={zoom >= 18}
+            aria-label="Zoom in"
+            className="w-10 h-10 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-700 hover:bg-slate-800 text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shadow-md cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+            title="Zoom in"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
+            type="button"
             onClick={handleZoomOut}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
-            title="Zoom Out"
+            disabled={zoom <= 12}
+            aria-label="Zoom out"
+            className="w-10 h-10 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-700 hover:bg-slate-800 text-white disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center shadow-md cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+            title="Zoom out"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
+            type="button"
             onClick={handleReset}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-emerald-400 flex items-center justify-center shadow-md cursor-pointer transition-colors"
-            title="Center on location"
+            aria-label="Reset map to location and default zoom"
+            className="w-10 h-10 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-700 hover:bg-slate-800 text-emerald-400 flex items-center justify-center shadow-md cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+            title="Reset map to location"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -475,13 +495,13 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
         {/* Drag hint */}
         <div className="absolute bottom-2.5 left-2.5 z-30 pointer-events-none">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 text-[11px] font-black uppercase text-white shadow-sm">
-            <MapPin className="w-3 h-3 text-emerald-400" /> Drag to pan
+            <MapPin className="w-3 h-3 text-emerald-400" /> Drag to pan · swipe sideways
           </span>
         </div>
       </div>
 
       {/* Compact hour slider — scrub to preview wind direction through the day */}
-      <div className={`px-3 sm:px-4 py-2.5 border-t flex items-center gap-2.5 ${
+      <div className={`px-3 sm:px-4 py-2.5 border-t flex items-center gap-2 ${
         isDark ? 'border-slate-800 bg-slate-950/[var(--card-opacity)]' : theme === 'hunting' ? 'border-[#d4c4a8] bg-[#eae1cf]/[var(--card-opacity)]' : theme === 'olive' ? 'border-[#d8d2c0] bg-[#efebd9]/[var(--card-opacity)]' : 'border-slate-100 bg-slate-50/[var(--card-opacity)]'
       }`}>
         <span className={`shrink-0 w-[54px] whitespace-nowrap text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-emerald-300' : theme === 'hunting' ? 'text-[#7a3208]' : theme === 'olive' ? 'text-[#3d4f21]' : 'text-emerald-700'}`}>
@@ -494,9 +514,28 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
           step={1}
           value={mapHour}
           onChange={(e) => setMapHour(parseInt(e.target.value, 10))}
-          aria-label="Wind map hour slider"
-          className={`flex-1 min-w-0 h-1.5 cursor-pointer ${isDark ? 'accent-emerald-400' : 'accent-emerald-600'}`}
+          aria-label="Wind map forecast hour"
+          aria-valuetext={getHour12Label(mapHour)}
+          title={`Preview wind at ${getHour12Label(mapHour)}`}
+          className={`flex-1 min-w-0 h-2 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-full ${isDark ? 'accent-emerald-400' : 'accent-emerald-600'}`}
         />
+        <button
+          type="button"
+          onClick={() => setMapHour(new Date().getHours())}
+          aria-label="Show wind for the current hour"
+          title="Jump to the current hour"
+          className={`shrink-0 min-h-9 px-2 rounded-md border text-[10px] font-black uppercase tracking-wide transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+            isDark
+              ? 'border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10'
+              : theme === 'hunting'
+              ? 'border-[#c85a17]/40 text-[#7a3208] hover:bg-[#c85a17]/10'
+              : theme === 'olive'
+              ? 'border-[#556b2f]/40 text-[#3d4f21] hover:bg-[#556b2f]/10'
+              : 'border-emerald-500/40 text-emerald-700 hover:bg-emerald-500/10'
+          }`}
+        >
+          Now
+        </button>
         <span className={`shrink-0 w-[76px] text-right whitespace-nowrap text-[10px] font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
           {windText} {speedVal} {unitLabel}
         </span>
