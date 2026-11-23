@@ -334,7 +334,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
           <button
             onClick={onSwitchToDashboard}
-            className={`px-4 py-2 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 self-start sm:self-auto ${
+            className={`min-h-11 px-4 py-2.5 text-white text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 self-start sm:self-auto ${
               'bg-emerald-600 hover:bg-emerald-500'
             }`}
           >
@@ -422,7 +422,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <button
                     onClick={handleGetCurrentLocation}
                     disabled={isLocating}
-                    className={`ml-1 px-2.5 py-1 rounded-lg flex items-center gap-1 text-xs font-bold uppercase transition-colors ${
+                    className={`min-h-11 ml-1 px-2.5 py-2.5 rounded-lg flex items-center gap-1 text-xs font-bold uppercase transition-colors ${
                       isDark
                         ? `bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-800/60 ${isHunterDark ? 'text-white' : 'text-emerald-400'}`
                         : 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200 border border-emerald-300'
@@ -547,7 +547,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                             onSelectLocation(fav);
                             showToast(`Switched active location to "${fav.name}"`);
                           }}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-extrabold uppercase transition-all ${
+                          className={`min-h-11 px-2.5 py-2.5 rounded-lg text-xs font-extrabold uppercase transition-all ${
                             isCurrentActive
                               ? `bg-emerald-500 ${isHunterDark ? 'text-white' : 'text-slate-950'}`
                               : isDark
@@ -561,7 +561,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         {/* Set as Default */}
                         <button
                           onClick={() => onSetDefaultLocation(fav)}
-                          className={`p-1.5 rounded-lg border transition-all ${
+                          className={`w-11 h-11 p-0 rounded-lg border flex items-center justify-center transition-all ${
                             isCurrentDefault
                               ? `bg-emerald-500/20 border-emerald-500/40 ${isHunterDark ? 'text-white' : 'text-emerald-400'}`
                               : isDark
@@ -576,7 +576,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                         {/* Delete from Saved */}
                         <button
                           onClick={() => onToggleFavorite(fav)}
-                          className={`p-1.5 rounded-lg border transition-all ${
+                          className={`w-11 h-11 p-0 rounded-lg border flex items-center justify-center transition-all ${
                             isDark
                               ? 'bg-slate-900 text-rose-400 hover:bg-rose-950/50 border-slate-800'
                               : 'bg-slate-100 text-rose-600 hover:bg-rose-50 border-slate-200'
@@ -713,17 +713,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
           </div>
 
-          {/* Dashboard Style Card */}
+          {/* Appearance & Dashboard Card — one compact place for the two
+              display choices hunters actually change in the field. */}
           <div className={`p-5 sm:p-6 rounded-3xl border space-y-4 ${isDark
           ? 'bg-slate-900/[var(--card-opacity)] backdrop-blur-md border-slate-800'
           : 'bg-white/[var(--card-opacity)] backdrop-blur-md border-slate-200 shadow-sm'}`}>
             <div className="flex items-center gap-2 pb-3 border-b border-slate-700/30">
-              <LayoutDashboard className="w-5 h-5 text-emerald-500" />
+              <Sun className="w-5 h-5 text-emerald-500" />
               <h2 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Dashboard Style
+                Appearance &amp; Dashboard
               </h2>
             </div>
 
+            {/* Dashboard style, folded into Appearance so Settings stops
+                reading like a preference dump. */}
             <div className={`p-3.5 rounded-2xl border flex items-center justify-between gap-3 ${
               isDark ? 'bg-slate-950/50 border-slate-800' : 'bg-slate-50 border-slate-200'
             }`}>
@@ -740,23 +743,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     Advanced Dashboard
                   </div>
                   <div className={`text-xs ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-                    The full-featured view with detailed factor breakdowns, prime hunting windows, and the 14-day forecast. The compact Simple Dashboard is the default.
+                    Full factor breakdowns and the 14-day forecast. Simple is the default.
                   </div>
                 </div>
               </div>
               {renderToggle(!simpleDashboard, (v) => onToggleSimpleDashboard?.(!v))}
-            </div>
-          </div>
-
-          {/* Appearance & Theme Card */}
-          <div className={`p-5 sm:p-6 rounded-3xl border space-y-4 ${isDark
-          ? 'bg-slate-900/[var(--card-opacity)] backdrop-blur-md border-slate-800'
-          : 'bg-white/[var(--card-opacity)] backdrop-blur-md border-slate-200 shadow-sm'}`}>
-            <div className="flex items-center gap-2 pb-3 border-b border-slate-700/30">
-              <Sun className="w-5 h-5 text-emerald-500" />
-              <h2 className={`text-base font-black ${isDark ? 'text-white' : 'text-slate-900'}`}>
-                Theme & Interface
-              </h2>
             </div>
 
             {/* Variant picker — 4 orthogonal visual identities. Light/Dark
@@ -891,10 +882,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               })}
             </div>
 
-            <div className="pt-2">
-              <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                Custom Background Photo
-              </label>
+            <details className="pt-2" open={!!customBackground}>
+              <summary className={`cursor-pointer list-none [&::-webkit-details-marker]:hidden flex items-center justify-between gap-2 py-2 text-xs font-bold uppercase tracking-wider ${
+                isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-900'
+              }`}>
+                <span>Custom background (optional)</span>
+                <span className="text-[10px] font-black opacity-60">Photo · opacity · blur</span>
+              </summary>
+              <div className="mt-2 space-y-4">
               <div className="flex items-center gap-3">
                 <input
                   type="file"
@@ -922,7 +917,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 />
                 <button
                   onClick={() => document.getElementById('custom-bg-upload')?.click()}
-                  className={`flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${
+                  className={`min-h-11 flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold transition-all ${
                     isDark ? 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-800'
                   }`}
                 >
@@ -935,7 +930,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       onSetCustomBackground(null);
                       showToast('Custom background removed');
                     }}
-                    className={`py-2.5 px-3 rounded-xl border flex items-center justify-center text-xs font-bold transition-all text-rose-500 ${
+                    className={`min-h-11 py-2.5 px-3 rounded-xl border flex items-center justify-center text-xs font-bold transition-all text-rose-500 ${
                       isDark ? 'bg-slate-950/60 border-slate-800 hover:bg-rose-950/30 hover:border-rose-900/50' : 'bg-slate-50 border-slate-200 hover:bg-rose-50 hover:border-rose-200'
                     }`}
                   >
@@ -943,7 +938,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   </button>
                 )}
               </div>
-            </div>
 
             {onSetCustomBackgroundOpacity && (
               <div className="space-y-4 pt-2 animate-fadeIn">
@@ -986,6 +980,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 )}
               </div>
             )}
+              </div>
+            </details>
           </div>
 
           {/* Quick Guides & Web App Tool Card */}

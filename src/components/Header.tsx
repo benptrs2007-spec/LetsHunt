@@ -65,6 +65,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Handle location search debounced
   useEffect(() => {
@@ -134,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header
-      className={`sticky top-0 z-50 px-3 sm:px-6 lg:px-8 py-1 transition-colors duration-200 border-b ${
+      className={`safe-top sticky top-0 z-50 px-3 sm:px-6 lg:px-8 py-1 transition-colors duration-200 border-b ${
         isDark
           ? 'bg-slate-950/[var(--card-opacity)] backdrop-blur-md border-slate-800/80 shadow-lg text-slate-100'
           : theme === 'hunting'
@@ -164,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={handleGetCurrentLocation}
               disabled={isLocating}
               aria-label={isLocating ? 'Locating…' : 'Locate my position via GPS'}
-              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 border ${
+              className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors flex-shrink-0 border ${
                 isDark
                   ? 'bg-slate-900 border-slate-800 hover:bg-slate-800 text-emerald-400'
                   : theme === 'hunting'
@@ -193,6 +194,7 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Search className={`w-4 h-4 mr-1.5 flex-shrink-0 ${isDark ? 'text-slate-400' : theme === 'hunting' ? 'text-[#8b7355]' : (theme === 'olive' || theme === 'hunting') ? 'text-[#6e6a5e]' : 'text-slate-500'}`} />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -264,7 +266,7 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onToggleColorMode}
               aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className={`header-color-mode-toggle w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center border flex-shrink-0 transition-all hover:-translate-y-0.5 active:translate-y-0 ${
+              className={`header-color-mode-toggle w-11 h-11 rounded-xl flex items-center justify-center border flex-shrink-0 transition-all hover:-translate-y-0.5 active:translate-y-0 ${
                 isDark
                   ? theme === 'hunting'
                     ? 'bg-[#3a332a] border-[#655745] text-[#f0ba7a] hover:bg-[#4a3b2c]'
@@ -443,6 +445,33 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </nav>
           </div>
+        </div>
+
+        {/* Phone location chip — a forecast is meaningless if a hunter
+            can't see which ground it belongs to. Tapping it jumps to the
+            search field so switching spots is one action. */}
+        <div className="sm:hidden mt-1.5 px-0.5">
+          <button
+            type="button"
+            onClick={() => searchInputRef.current?.focus()}
+            aria-label={`Change forecast location, currently ${currentLocation.name}`}
+            className={`w-full min-h-11 flex items-center gap-1.5 rounded-xl border px-2.5 py-2 text-left transition-colors ${
+              isDark
+                ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-200'
+                : theme === 'hunting'
+                ? 'bg-[#c85a17]/10 border-[#c85a17]/30 text-[#7a3208]'
+                : theme === 'olive'
+                ? 'bg-[#556b2f]/10 border-[#556b2f]/30 text-[#3d4f21]'
+                : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+            }`}
+          >
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-[10px] font-black uppercase tracking-wider shrink-0 opacity-70">Forecasting</span>
+            <span className="text-xs font-black truncate">
+              {currentLocation.name}{currentLocation.admin1 ? `, ${currentLocation.admin1}` : ''}
+            </span>
+            <Search className="w-3.5 h-3.5 ml-auto shrink-0 opacity-70" />
+          </button>
         </div>
       </div>
     </header>

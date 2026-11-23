@@ -316,7 +316,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         <div className="relative px-6 pt-6 pb-4 text-center">
           <button
             onClick={() => onComplete(null)}
-            className={`absolute right-4 top-4 p-1.5 rounded-full transition-colors hover:bg-slate-500/10 ${textSecondary}`}
+            className={`absolute right-3 top-3 w-11 h-11 flex items-center justify-center rounded-full transition-colors hover:bg-slate-500/10 ${textSecondary}`}
             title="Skip setup"
           >
             <X className="w-4 h-4" />
@@ -361,9 +361,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <CloudSun className="w-4.5 h-4.5 text-amber-500" />
                 </div>
                 <div>
-                  <div className={`text-xs font-extrabold ${textPrimary}`}>7-Day Movement Forecast</div>
+                  <div className={`text-xs font-extrabold ${textPrimary}`}>14-Day Movement Outlook</div>
                   <div className={`text-xs mt-0.5 leading-relaxed ${textSecondary}`}>
-                    Every day gets a simple 0–100 hunt score, best morning/evening windows, cold-front and barometer conditions, plus moon times.
+                    Your dashboard shows a close-up 7-day plan, plus a 14-day outlook for spotting the next cold front. Every day gets a 0–100 hunt score, best morning/evening windows, and moon times.
                   </div>
                 </div>
               </div>

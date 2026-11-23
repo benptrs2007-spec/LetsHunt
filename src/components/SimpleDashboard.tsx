@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   DailyForecast,
   Location,
@@ -14,6 +14,7 @@ import { SimpleWindMap } from './SimpleWindMap';
 import {
   getBestStandForWind,
   getHour12Label,
+  getWindDirectionText,
   getRatingFromScore,
   getWeatherDetails,
   isHourlyRainBreak,
@@ -40,8 +41,8 @@ import {
   Star,
   ArrowRight,
   Lightbulb,
-  ChevronDown,
   Thermometer,
+  MapPin,
 } from 'lucide-react';
 import { getRutPhase } from '../utils/rutEngine';
 
@@ -55,6 +56,7 @@ interface SimpleDashboardProps {
   hasCustomBackground?: boolean;
   lastRefreshed?: Date | null;
   onSwitchToFullDashboard?: () => void;
+  onOpenFourteenDay?: () => void;
 }
 
 const getWeatherIcon = (iconName: string, className: string) => {
@@ -367,6 +369,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   theme = 'dark',
   isDark = theme === 'dark',
   hasCustomBackground = false,
+  onOpenFourteenDay,
 }) => {
   // Which day's hourly bars are shown in the "Hourly Hunt Score" card.
   const [activeDayDate, setActiveDayDate] = useState<string>('');
@@ -375,79 +378,10 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   const [detailHour, setDetailHour] = useState<number>(() => new Date().getHours());
   // Hero preview hour, driven by the small hourly-card scrubber.
   const [heroHour, setHeroHour] = useState<number>(() => new Date().getHours());
-  // Daily-tip badge dropdown visibility.
-  const [tipOpen, setTipOpen] = useState(false);
-  // Fixed-position panel placement. The panel is positioned in viewport
-  // coordinates (position: fixed) with every side clamped inside the screen,
-  // so it physically cannot run off a phone — regardless of font scaling,
-  // title wrapping, or rotation.
-  const [tipPos, setTipPos] = useState<{ left: number; top: number; width: number } | null>(null);
-  const tipRef = useRef<HTMLDivElement>(null);
-  const tipPanelRef = useRef<HTMLDivElement>(null);
-
-  // Anchor the panel just below the badge, clamped to the viewport: width is
-  // capped to the screen, left is nudged right if the badge sits too far left,
-  // and top is lifted if the rendered panel would run past the bottom.
-  const updateTipPos = () => {
-    if (!tipRef.current) return;
-    const badgeRect = tipRef.current.getBoundingClientRect();
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const width = Math.min(320, vw - 16);
-    const left = Math.max(8, Math.min(badgeRect.left, vw - width - 8));
-    let top = badgeRect.bottom + 8;
-    if (tipPanelRef.current) {
-      const panelHeight = tipPanelRef.current.getBoundingClientRect().height;
-      if (top + panelHeight > vh - 8) {
-        top = Math.max(8, vh - panelHeight - 8);
-      }
-    }
-    setTipPos({ left, top, width });
-  };
-  const toggleTip = () => {
-    if (tipOpen) {
-      setTipOpen(false);
-      return;
-    }
-    // Position before the panel exists (height unknown — top will be clamped
-    // again by the layout effect below once it has rendered).
-    updateTipPos();
-    setTipOpen(true);
-  };
-
-  // Once the panel has rendered, re-clamp so its bottom never leaves the
-  // screen either.
-  useLayoutEffect(() => {
-    if (tipOpen) updateTipPos();
-  }, [tipOpen]);
-
-  // Close the tip dropdown on outside tap/click or Escape; re-clamp the panel
-  // on resize while open so rotating the phone can't push it off-screen.
-  useEffect(() => {
-    const onPointerDown = (e: MouseEvent | TouchEvent) => {
-      if (tipRef.current && !tipRef.current.contains(e.target as Node)) {
-        setTipOpen(false);
-      }
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setTipOpen(false);
-    };
-    const onResize = () => {
-      if (tipOpen) updateTipPos();
-    };
-    document.addEventListener('mousedown', onPointerDown);
-    document.addEventListener('touchstart', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
-    window.addEventListener('resize', onResize);
-    return () => {
-      document.removeEventListener('mousedown', onPointerDown);
-      document.removeEventListener('touchstart', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('resize', onResize);
-    };
-  }, [tipOpen]);
-
   const today = daily[0];
+  // The simple view is a seven-day field plan. Older days stay available via
+  // the explicit 14-day outlook link instead of an endless sideways strip.
+  const visibleDaily = daily.slice(0, 7);
   const detailDay = daily.find((d) => d.date === detailDayDate) || null;
 
   // Day detail subpage: reuse the existing detailed prediction view (factor
@@ -487,6 +421,12 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   // Tip sentences for the Hunt Tip dropdown — keyed to the selected day and
   // hour so the advice matches exactly what's on screen.
   const activeTips = buildDailyTip(activeDay, units, location, heroHourData, heroHour);
+  // Mirror the tip engine's scent/stand inputs so the field card can show them
+  // as primary information instead of hiding them in a 10px sub-label.
+  const heroWindDeg = heroHourData?.windDirectionDeg ?? activeDay.windDirectionDeg;
+  const windDirectionText = getWindDirectionText(heroWindDeg);
+  const scentDirection = getDownwindText((heroWindDeg + 180) % 360);
+  const bestStandForWind = getBestStandForWind(heroWindDeg);
   const isLiveNow = activeDay.date === today.date && heroHour === currentLocalHour;
   const heroScore = heroHourData ? heroHourData.huntScore : activeDay.huntScore;
   const heroRating = getRatingFromScore(heroScore);
@@ -537,67 +477,32 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
        unchanged. The title and hero span both columns; the score/chart/map
        cards pair up. */
     <div className="w-full space-y-5 sm:space-y-7 desktop-grid desktop-grid-2 animate-fadeIn">
-      {/* Page title — Oswald/display face on the Hunting theme, standard
-          sans elsewhere (h1 picks it up automatically). Follows the
-          selected day so the header always labels whose data is shown. The
-          Hunt Tip badge sits to the right of the selected day's title and
-          opens a dropdown with an ultra-specific tip for that day/hour. */}
+      {/* Page title plus a permanent location chip. A hunter must always know
+          which ground the score belongs to — hiding that behind a modal or a
+          caption makes the forecast unsafe to act on. */}
       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 desktop-col-span-full">
-        <h1 className={`text-3xl sm:text-4xl font-black tracking-tight leading-tight ${
-          isDark ? 'text-white' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
-        }`}>
-          {activeDay.dayName === 'Today' ? "Today's" : `${activeDay.dayName}'s`} Hunt
-        </h1>
-          <div className="relative inline-flex" ref={tipRef}>
-            <button
-              type="button"
-              onClick={toggleTip}
-              aria-expanded={tipOpen}
-              aria-haspopup="true"
-              aria-label={`${activeDay.dayName === 'Today' ? "Today's" : `${activeDay.dayName}'s`} hunt tip`}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 ${
-                isDark
-                  ? 'bg-slate-950/70 border-amber-400/40 text-amber-300 hover:bg-slate-800/80 focus-visible:ring-amber-400'
-                  : theme === 'hunting'
-                  ? 'bg-[#f4eee1]/90 border-[#c85a17]/50 text-[#7a3208] hover:bg-[#eae1cf] focus-visible:ring-[#c85a17]'
-                  : theme === 'olive'
-                  ? 'bg-[#f7f5ed]/90 border-[#556b2f]/50 text-[#3d4f21] hover:bg-[#efebd9] focus-visible:ring-[#556b2f]'
-                  : 'bg-amber-50 border-amber-400/60 text-amber-700 hover:bg-amber-100 focus-visible:ring-amber-600'
-              }`}
-            >
-              <Lightbulb className="w-3 h-3" />
-              Hunt Tip
-              <ChevronDown className={`w-3 h-3 transition-transform ${tipOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {tipOpen && tipPos && (
-              <div
-                ref={tipPanelRef}
-                style={{ left: tipPos.left, top: tipPos.top, width: tipPos.width }}
-                className={`fixed z-50 rounded-2xl border p-3.5 shadow-2xl ${
-                  isDark
-                    ? 'bg-slate-900/95 backdrop-blur-xl border-slate-700 text-slate-100'
-                    : theme === 'hunting'
-                    ? 'bg-[#f4eee1] border-[#d4c4a8] text-[#2a1b0e]'
-                    : theme === 'olive'
-                    ? 'bg-[#f7f5ed] border-[#d8d2c0] text-[#1e2e1b]'
-                    : 'bg-white border-slate-200 text-slate-900'
-                }`}
-              >
-                <div className={`text-[10px] font-black uppercase tracking-wider mb-2 ${
-                  isDark ? 'text-amber-300' : theme === 'hunting' ? 'text-[#7a3208]' : theme === 'olive' ? 'text-[#3d4f21]' : 'text-amber-600'
-                }`}>
-                  {activeDay.dayName === 'Today' ? "Today's" : `${activeDay.dayName}'s`} Hunt Tip · {activeDay.dateFormatted}
-                </div>
-                <div className="space-y-1.5">
-                  {activeTips.map((tip) => (
-                    <p key={tip} className="text-sm leading-snug">
-                      {tip}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            )}
+        <div className="min-w-0">
+          <h1 className={`text-3xl sm:text-4xl font-black tracking-tight leading-tight ${
+            isDark ? 'text-white' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
+          }`}>
+            {activeDay.dayName === 'Today' ? "Today's" : `${activeDay.dayName}'s`} Hunt
+          </h1>
+          <div className={`mt-1 inline-flex max-w-full items-center gap-1.5 rounded-xl border px-2.5 py-1 ${
+            isDark
+              ? 'bg-slate-950/60 border-slate-700 text-slate-200'
+              : theme === 'hunting'
+              ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#7a3208]'
+              : theme === 'olive'
+              ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#3d4f21]'
+              : 'bg-slate-50 border-slate-200 text-slate-700'
+          }`}>
+            <MapPin className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-[10px] font-black uppercase tracking-wider shrink-0 opacity-70">Ground</span>
+            <span className="text-xs font-black truncate">
+              {location.name}{location.admin1 ? `, ${location.admin1}` : ''}
+            </span>
           </div>
+        </div>
       </div>
 
       {/* 1. Compact hero */}
@@ -641,6 +546,12 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
             <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider whitespace-nowrap">{heroRating}</span>
           </div>
         </div>
+
+        {/* One sentence keeps the three score views from reading as
+            contradictory numbers in the field. */}
+        <p className={`relative z-10 -mt-1 mb-3 text-[10px] sm:text-[11px] font-semibold leading-snug ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+          Big score = the hour selected with the slider below. AM/PM = window average. Bars = one hour each.
+        </p>
 
         {/* Current conditions grid */}
         <div className="grid grid-cols-2 gap-2.5 min-w-0 w-full relative z-10">
@@ -692,6 +603,52 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
           </div>
       </div>
 
+      {/* Field plan — the tactical advice used to hide behind a "Hunt Tip"
+          badge. It gets a full card near the hero because it is the most
+          actionable thing in the forecast. */}
+      <div className={`rounded-2xl border p-4 sm:p-5 shadow-lg ${cardSurface} desktop-col-span-full`}>
+        <div className="flex items-start gap-3">
+          <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center shrink-0 ${
+            isDark ? 'bg-amber-500/15 border-amber-500/30' : 'bg-amber-500/15 border-amber-500/40'
+          }`}>
+            <Lightbulb className="w-5 h-5 text-amber-500" />
+          </div>
+          <div className="min-w-0 flex-1 space-y-2.5">
+            <div>
+              <div className="text-[10px] font-black uppercase tracking-wider text-amber-500">
+                Field Plan · {dayLabel(activeDay)} · {isLiveNow ? 'Now' : getHour12Label(heroHour)}
+              </div>
+              <p className={`mt-0.5 text-sm sm:text-[15px] font-bold leading-snug ${
+                isDark ? 'text-slate-100' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
+              }`}>
+                {activeTips[0]}
+              </p>
+            </div>
+            <div className={`rounded-xl border px-3 py-2.5 flex items-start gap-2 ${
+              isDark ? 'bg-slate-950/50 border-slate-700/70'
+                : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]'
+                : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]'
+                : 'bg-slate-50 border-slate-200'
+            }`}>
+              <Wind className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" />
+              <div className="min-w-0">
+                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                  Scent &amp; stand
+                </div>
+                <div className={`text-xs sm:text-sm font-bold leading-snug ${
+                  isDark ? 'text-slate-100' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
+                }`}>
+                  Wind {windDirectionText} · scent {scentDirection}.{' '}
+                  {bestStandForWind
+                    ? `Best match: ${bestStandForWind.name} (${bestStandForWind.idealWind}).`
+                    : 'Keep that scent line off the trails.'}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 2. Hourly hunt score bar */}
       <div className={`rounded-2xl border p-3 sm:p-4 shadow-md ${cardSurface}`}>
         <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
@@ -700,7 +657,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               <BarChart3 className="w-4 h-4" /> Hourly Hunt Score
             </h2>
             <p className={`text-[11px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              {activeDay.dayName} · {activeDay.dateFormatted} — tap a bar to preview that hour
+              {activeDay.dayName} · {activeDay.dateFormatted} — drag the slider below to check any hour
             </p>
             <div className="flex items-center gap-2 text-[10px] font-bold flex-wrap mt-1.5">
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm inline-block" style={{ background: getScoreBarColor(90) }} /> Great</span>
@@ -717,7 +674,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               setDetailDayDate(activeDay.date);
               window.scrollTo({ top: 0, behavior: 'auto' });
             }}
-            className={`shrink-0 inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 ${
+            className={`min-h-11 shrink-0 inline-flex items-center gap-1.5 rounded-lg border px-3 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus-visible:ring-2 ${
               isDark
                 ? 'border-slate-600 text-emerald-300 hover:bg-emerald-500/10 focus-visible:ring-emerald-400'
                 : theme === 'hunting'
@@ -731,18 +688,16 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
           </button>
         </div>
 
-        <div className="flex items-end gap-[2px] h-24 sm:h-28">
+        {/* Visual-only bars: 24 bars are ~13px wide on a phone, so they are
+            not touch targets. The full-width range slider below owns hour
+            selection and works with gloves. */}
+        <div className="flex items-end gap-[2px] h-24 sm:h-28" aria-hidden="true">
           {hourlyBars.map((h, i) => {
             const selected = i === heroHour;
             return (
               <div
                 key={`${h.time}-${i}`}
-                title={`${h.time} · ${h.huntScore}/100 (${getRatingFromScore(h.huntScore)}) — tap to preview this hour`}
-                onClick={() => setHeroHour(i)}
-                role="button"
-                tabIndex={-1}
-                aria-label={`${h.time} — hunt score ${h.huntScore}, ${getRatingFromScore(h.huntScore)}. Tap to preview this hour.`}
-                className={`flex-1 rounded-t-sm min-w-0 cursor-pointer transition-all ${selected ? 'z-10' : 'hover:brightness-110'}`}
+                className={`flex-1 rounded-t-sm min-w-0 transition-all ${selected ? 'z-10' : ''}`}
                 style={{
                   height: `${Math.max(6, h.huntScore)}%`,
                   backgroundColor: getScoreBarColor(h.huntScore),
@@ -850,14 +805,37 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               <CalendarDays className="w-4 h-4" /> Daily Hunt Score
             </h2>
             <p className={`text-[11px] font-semibold ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Morning and evening at a glance
+              7-day plan · morning and evening at a glance · swipe for more
             </p>
           </div>
+          {onOpenFourteenDay && (
+            <button
+              type="button"
+              onClick={onOpenFourteenDay}
+              className={`min-h-11 shrink-0 inline-flex items-center gap-1 rounded-xl border px-3 py-2 text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                isDark
+                  ? 'border-slate-600 text-emerald-300 hover:bg-emerald-500/10'
+                  : theme === 'hunting'
+                  ? 'border-[#c85a17]/40 text-[#7a3208] hover:bg-[#c85a17]/10'
+                  : theme === 'olive'
+                  ? 'border-[#556b2f]/40 text-[#3d4f21] hover:bg-[#556b2f]/10'
+                  : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'
+              }`}
+            >
+              14-day outlook <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
-        <div className="overflow-x-auto py-1.5 -mx-1 px-1">
+        <div
+          className="scroll-smooth snap-x snap-mandatory overflow-x-auto py-1.5 -mx-1 px-1 [scrollbar-width:thin]"
+          style={{
+            maskImage: 'linear-gradient(to right, transparent 0, black 8px, black calc(100% - 12px), transparent 100%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent 0, black 8px, black calc(100% - 12px), transparent 100%)',
+          }}
+        >
           <div className="flex items-stretch gap-2 sm:gap-2.5 min-w-[560px]">
-            {daily.map((d) => {
+            {visibleDaily.map((d) => {
               const isSelected = d.date === (activeDayDate || today.date);
               const wet = isWetDay(d);
               const maxPrecipProb = getMaxPrecipProb(d);
@@ -894,7 +872,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
                     setHeroHour(new Date().getHours());
                   }}
                   title={`${d.dayName} ${d.dateFormatted} · AM ${am} (${amRating}) · PM ${pm} (${pmRating})`}
-                  className={`group flex-1 min-w-[124px] flex flex-col rounded-xl transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${ringClass}`}
+                  className={`group flex-1 min-w-[124px] snap-start flex flex-col rounded-xl transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${ringClass}`}
                 >
                   {/* Day header — compact day label + readable status badges */}
                   <div className="px-2.5 pt-2.5 pb-2 text-center">

@@ -249,20 +249,9 @@ export const AccountSettingsCard: React.FC<AccountSettingsCardProps> = ({
   }`;
   const inputCls = `w-full bg-transparent text-xs focus:outline-none ${isDark ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400'}`;
 
-  if (!isSupabaseConfigured) {
-    return (
-      <div className={`p-5 sm:p-6 rounded-3xl border space-y-3 ${cardBg}`}>
-        <div className="flex items-center gap-2 pb-3 border-b border-slate-700/30">
-          <ShieldCheck className="w-5 h-5 text-emerald-500" />
-          <h2 className={`text-base font-black ${textPrimary}`}>Account & HuntClub</h2>
-        </div>
-        <p className={`text-xs leading-relaxed ${textSecondary}`}>
-          Accounts aren't configured yet — add <code className="font-mono">VITE_SUPABASE_URL</code> and{' '}
-          <code className="font-mono">VITE_SUPABASE_ANON_KEY</code> to <code className="font-mono">.env.local</code> to enable sign-in and HuntClubs.
-        </p>
-      </div>
-    );
-  }
+  // Accounts/HuntClubs are not part of this build. Hide the whole card rather
+  // than shipping developer environment-variable instructions to hunters.
+  if (!isSupabaseConfigured) return null;
 
   return (
     <div className={`p-5 sm:p-6 rounded-3xl border space-y-4 ${cardBg}`}>

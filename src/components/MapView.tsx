@@ -3159,7 +3159,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 setShowAddDropdown((prev) => !prev);
                 setShowLayersDropdown(false);
               }}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-400/50 hover:scale-105 active:scale-95"
+              className="min-h-11 px-3.5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase tracking-wider shadow-2xl flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-400/50 hover:scale-105 active:scale-95"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
               <span>Add</span>
@@ -3326,9 +3326,27 @@ export const MapView: React.FC<MapViewProps> = ({
                   <span className={`text-xs font-extrabold uppercase tracking-wider ${best ? (isDark ? 'text-emerald-400' : isHunting ? 'text-[#c85a17]' : isOlive ? 'text-[#556b2f]' : 'text-emerald-600') : (isDark ? 'text-slate-400' : isHunting ? 'text-[#8b7355]' : isOlive ? 'text-[#6e6a5e]' : 'text-slate-500')}`}>
                     Best:
                   </span>
-                  <span className={`font-black truncate max-w-[100px] sm:max-w-[140px] ${isDark ? 'text-white' : isHunting ? 'text-[#2a1b0e]' : isOlive ? 'text-[#1e2e1b]' : 'text-slate-900'}`}>
-                    {best ? best.name : (pins.length === 0 || !hasNonHomePins ? 'No Stands' : 'No Pref Wind')}
-                  </span>
+                  {best ? (
+                    <span className={`font-black truncate max-w-[100px] sm:max-w-[140px] ${isDark ? 'text-white' : isHunting ? 'text-[#2a1b0e]' : isOlive ? 'text-[#1e2e1b]' : 'text-slate-900'}`}>
+                      {best.name}
+                    </span>
+                  ) : pins.length === 0 || !hasNonHomePins ? (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowAddDropdown(true);
+                        setShowLayersDropdown(false);
+                      }}
+                      className="min-h-11 px-2 rounded-xl bg-emerald-600/15 border border-emerald-500/40 text-emerald-500 font-black uppercase tracking-wider text-xs cursor-pointer"
+                    >
+                      + Add stand
+                    </button>
+                  ) : (
+                    <span className={`font-black truncate max-w-[100px] sm:max-w-[140px] ${isDark ? 'text-white' : isHunting ? 'text-[#2a1b0e]' : isOlive ? 'text-[#1e2e1b]' : 'text-slate-900'}`}>
+                      No Pref Wind
+                    </span>
+                  )}
                   {best && (
                     <span className={`text-xs font-normal truncate ${isDark ? 'text-emerald-300/80' : isHunting ? 'text-[#c85a17]/80' : isOlive ? 'text-[#556b2f]/80' : 'text-emerald-700/80'}`}>
                       ({windDirText}@{hourLabel})
@@ -3340,7 +3358,7 @@ export const MapView: React.FC<MapViewProps> = ({
                     e.stopPropagation();
                     setShowBestWindBadge(false);
                   }}
-                  className={`p-0.5 rounded-md transition-colors cursor-pointer flex-shrink-0 ${
+                  className={`w-11 h-11 p-0 rounded-xl flex items-center justify-center transition-colors cursor-pointer flex-shrink-0 ${
                     best
                       ? (isDark ? 'text-emerald-300 hover:text-white hover:bg-emerald-900/50' : isHunting ? 'text-[#c85a17] hover:text-[#2a1b0e] hover:bg-[#d4c4a8]/50' : isOlive ? 'text-[#556b2f] hover:text-[#1e2e1b] hover:bg-[#d8d2c0]/50' : 'text-emerald-700 hover:text-emerald-950 hover:bg-emerald-200/50')
                       : (isDark ? 'text-slate-400 hover:text-white hover:bg-slate-800' : isHunting ? 'text-[#8b7355] hover:text-[#2a1b0e] hover:bg-[#d4c4a8]/50' : isOlive ? 'text-[#6e6a5e] hover:text-[#1e2e1b] hover:bg-[#d8d2c0]/50' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200')
@@ -3361,7 +3379,7 @@ export const MapView: React.FC<MapViewProps> = ({
               setShowLayersDropdown((prev) => !prev);
               setShowAddDropdown(false);
             }}
-            className={`px-3 py-1.5 rounded-xl border shadow-xl flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider backdrop-blur-md transition-all cursor-pointer ${
+            className={`min-h-11 px-3 py-2.5 rounded-xl border shadow-xl flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider backdrop-blur-md transition-all cursor-pointer ${
               showLayersDropdown
                 ? 'bg-emerald-600 text-white border-emerald-400'
                 : isDark
@@ -3919,7 +3937,7 @@ export const MapView: React.FC<MapViewProps> = ({
           )}
           <button
             onClick={handleGetCurrentLocation}
-            className={`p-2.5 rounded-2xl border shadow-xl backdrop-blur-md transition-all cursor-pointer ${
+            className={`w-11 h-11 p-0 rounded-2xl border shadow-xl backdrop-blur-md flex items-center justify-center transition-all cursor-pointer ${
               isDark
                 ? 'bg-slate-950/85 border-slate-800 text-emerald-400 hover:bg-slate-800 hover:text-white'
                 : 'bg-white/95 border-slate-200 text-emerald-600 hover:bg-slate-50'

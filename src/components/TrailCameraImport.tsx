@@ -126,7 +126,7 @@ export const TrailCameraImport: React.FC<TrailCameraImportProps> = ({
             </div>
             <button
               type="button"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 pointer-events-none"
+              className="min-h-11 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center gap-2 pointer-events-none"
             >
               <Camera className="w-4 h-4" /> Select Photos From Device
             </button>

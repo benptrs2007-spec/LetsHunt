@@ -831,7 +831,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
                 <button
                   onClick={() => importInputRef.current?.click()}
                   disabled={importing}
-                  className={`${buttonPrimary} ${buttonPrimaryBg} shadow-md text-xs sm:text-xs px-2.5 sm:px-3.5 py-1.5 sm:py-2 ${importing ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
+                  className={`${buttonPrimary} ${buttonPrimaryBg} shadow-md text-xs sm:text-xs px-2.5 sm:px-3.5 min-h-11 py-2.5 ${importing ? 'opacity-50 cursor-wait' : 'cursor-pointer'}`}
                   title="Import more trail camera photos"
                 >
                   {importing ? <Loader2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-spin" /> : <Upload className="w-3 h-3 sm:w-3.5 sm:h-3.5" />}
@@ -875,7 +875,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
               onClick={() => setShowFilters((prev) => !prev)}
               aria-expanded={showFilters}
               aria-haspopup="true"
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-xs font-black uppercase tracking-wider transition-all border cursor-pointer whitespace-nowrap flex-shrink-0 shadow-sm ${
+              className={`min-h-11 flex items-center gap-1.5 px-3 sm:px-3.5 py-2.5 rounded-lg text-xs sm:text-xs font-black uppercase tracking-wider transition-all border cursor-pointer whitespace-nowrap flex-shrink-0 shadow-sm ${
                 showFilters || activeFilterCount > 0
                   ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md'
                   : isDark
@@ -925,7 +925,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
           }`}>
             <button
               onClick={() => setActiveTab('gallery')}
-              className={`flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+              className={`min-h-11 flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-2.5 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'gallery'
                   ? 'bg-emerald-500 text-slate-950 shadow-md'
                   : isDark
@@ -942,7 +942,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
 
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+              className={`min-h-11 flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-2.5 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'analytics'
                   ? 'bg-emerald-500 text-slate-950 shadow-md'
                   : isDark
@@ -959,7 +959,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
 
             <button
               onClick={() => setActiveTab('insights')}
-              className={`flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
+              className={`min-h-11 flex-1 sm:flex-none justify-center px-2.5 sm:px-3.5 py-2.5 rounded-lg text-xs sm:text-xs font-black flex items-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === 'insights'
                   ? 'bg-emerald-500 text-slate-950 shadow-md'
                   : isDark
@@ -1027,7 +1027,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
               value={selectedSpotId}
               onChange={(e) => setSelectedSpotId(e.target.value)}
               title="Pick a spot — then use the buttons to set as default or delete it"
-              className={`w-full sm:flex-1 min-w-0 sm:min-w-[160px] sm:max-w-xs px-2.5 py-2 text-xs sm:text-xs font-bold rounded-xl border outline-none cursor-pointer ${inputBg}`}
+              className={`w-full sm:flex-1 min-w-0 sm:min-w-[160px] sm:max-w-xs min-h-11 px-2.5 py-2 text-xs sm:text-xs font-bold rounded-xl border outline-none cursor-pointer ${inputBg}`}
             >
               <option value="">
                 {allSpots.length === 0 ? '— No spots yet —' : '— Pick a spot —'}
@@ -1045,7 +1045,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
             <button
               onClick={() => setIsLocationModalOpen(true)}
               title="Add a new camera spot"
-              className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 ${buttonPrimaryBg}`}
+              className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 sm:px-3 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 ${buttonPrimaryBg}`}
             >
               <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>Add</span>
@@ -1077,7 +1077,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
                           : 'Mark selected spot as default')
                 }
                 disabled={!selectedSpotId || !!allSpots.find((s) => s.id === selectedSpotId)?._isMapPin}
-                className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 ${
+                className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 rounded-xl text-xs sm:text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 ${
                   !selectedSpotId || allSpots.find((s) => s.id === selectedSpotId)?._isMapPin
                     ? isDark
                       ? 'bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed opacity-60'
@@ -1120,7 +1120,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
                         ? 'Map pins can\u2019t be deleted here'
                         : 'Delete selected spot')
                 }
-                className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
+                className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 sm:px-3 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
                   !selectedSpotId || allSpots.find((s) => s.id === selectedSpotId)?._isMapPin
                     ? isDark
                       ? 'bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed opacity-60'
@@ -1149,7 +1149,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
               value={selectedTargetId}
               onChange={(e) => setSelectedTargetId(e.target.value)}
               title="Select a target before importing photos directly to it"
-              className={`w-full sm:flex-1 min-w-0 sm:min-w-[160px] sm:max-w-xs px-2.5 py-2 text-xs sm:text-xs font-bold rounded-xl border outline-none cursor-pointer ${inputBg}`}
+              className={`w-full sm:flex-1 min-w-0 sm:min-w-[160px] sm:max-w-xs min-h-11 px-2.5 py-2 text-xs sm:text-xs font-bold rounded-xl border outline-none cursor-pointer ${inputBg}`}
             >
               <option value="">
                 {targets.length === 0 ? '— No targets yet —' : `— Select a target (${targets.length}) —`}
@@ -1174,7 +1174,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
               onClick={() => targetImportInputRef.current?.click()}
               disabled={!selectedTargetId || importing}
               title={!selectedTargetId ? 'Select a target first' : 'Import photos and tag them to the selected target'}
-              className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 shadow-sm flex-shrink-0 ${
+              className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 sm:px-3 rounded-lg text-xs sm:text-xs font-bold transition-all border cursor-pointer flex items-center gap-1 shadow-sm flex-shrink-0 ${
                 !selectedTargetId || importing
                   ? isDark
                     ? 'bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed opacity-60'
@@ -1192,7 +1192,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
             <button
               onClick={() => setIsTargetManagerOpen(true)}
               title="Open the target manager to add, edit, recolour, or remove targets"
-              className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 ${buttonPrimaryBg}`}
+              className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 sm:px-3 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 shadow-sm flex-shrink-0 ${buttonPrimaryBg}`}
             >
               <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
               <span>Add</span>
@@ -1210,7 +1210,7 @@ export const TrailCameraView: React.FC<TrailCameraViewProps> = ({
               }}
               disabled={!selectedTargetId}
               title={!selectedTargetId ? 'Pick a target first' : 'Delete selected target'}
-              className={`flex-1 sm:flex-none justify-center px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
+              className={`flex-1 sm:flex-none justify-center min-h-11 px-2.5 py-2.5 sm:px-3 rounded-lg text-xs sm:text-xs font-bold uppercase tracking-wider transition-all border cursor-pointer flex items-center gap-0.5 sm:gap-1 flex-shrink-0 ${
                 !selectedTargetId
                   ? isDark
                     ? 'bg-slate-900/50 border-slate-800 text-slate-600 cursor-not-allowed opacity-60'

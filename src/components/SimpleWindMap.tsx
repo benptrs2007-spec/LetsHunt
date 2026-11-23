@@ -410,21 +410,21 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
         <div className="absolute bottom-2.5 right-2.5 z-30 flex flex-col gap-1.5">
           <button
             onClick={handleZoomIn}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
+            className="w-11 h-11 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
             title="Zoom In"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={handleZoomOut}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
+            className="w-11 h-11 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-white flex items-center justify-center shadow-md cursor-pointer transition-colors"
             title="Zoom Out"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={handleReset}
-            className="w-8 h-8 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-emerald-400 flex items-center justify-center shadow-md cursor-pointer transition-colors"
+            className="w-11 h-11 rounded-xl bg-slate-950/80 backdrop-blur-md border border-slate-800 hover:bg-slate-800 text-emerald-400 flex items-center justify-center shadow-md cursor-pointer transition-colors"
             title="Center on location"
           >
             <RotateCcw className="w-4 h-4" />

@@ -873,6 +873,12 @@ rect:focus {
      elements carrying BOTH size classes are affected (icon-shaped nodes). */
   .w-3.h-3 { width: 0.875rem; height: 0.875rem; }        /* 12 → 14px */
   .w-3\.5.h-3\.5 { width: 1rem; height: 1rem; }        /* 14 → 16px */
+
+  /* Notch/home-indicator safe areas. The header and fixed bottom nav opt in
+     explicitly so PWA standalone mode never hides controls behind the notch
+     or iPhone home bar. */
+  .safe-top { padding-top: max(0.25rem, env(safe-area-inset-top)); }
+  .safe-bottom { padding-bottom: max(0.25rem, env(safe-area-inset-bottom)); }
 }
 
 /* Dark Hunting contrast repair: the shared hunter green remains the only

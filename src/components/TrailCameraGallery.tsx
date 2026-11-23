@@ -375,7 +375,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
               setIsSelectMode(!isSelectMode);
               setSelectedIds([]);
             }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${tc.selectModeBtn(isSelectMode)}`}
+            className={`min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold transition-all border cursor-pointer ${tc.selectModeBtn(isSelectMode)}`}
           >
             {isSelectMode ? 'Cancel Selection' : 'Select Multiple'}
           </button>
@@ -385,7 +385,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
               setShowTimeDefaultedOnly(!showTimeDefaultedOnly);
               setCurrentPage(1);
             }}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1.5 ${
+            className={`min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold transition-all border cursor-pointer flex items-center gap-1.5 ${
               showTimeDefaultedOnly
                 ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold'
                 : tc.selectModeBtn(false)
@@ -400,7 +400,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
             <>
               <button
                 onClick={handleSelectAll}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${tc.selectAllBtn}`}
+                className={`min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${tc.selectAllBtn}`}
               >
                 {selectedIds.length === paginatedPhotos.length ? 'Deselect All' : 'Select All Page'}
               </button>
@@ -416,7 +416,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => setAssignLocationModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+              className="min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-500 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
             >
               <MapPin className="w-3.5 h-3.5" /> Assign Spot
             </button>
@@ -424,7 +424,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
             <button
               onClick={() => { setTargetAssignId(''); setAssignTargetModalOpen(true); }}
               disabled={targets.length === 0}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+              className="min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
             >
               <Crosshair className="w-3.5 h-3.5" /> Tag Target
             </button>
@@ -432,7 +432,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
             <button
               onClick={handleBulkReOcr}
               disabled={bulkReOcrInProgress}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+              className="min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
             >
               <ScanLine className="w-3.5 h-3.5" />
               {bulkReOcrInProgress ? 'Re-OCR running…' : `Re-run OCR (${selectedIds.length})`}
@@ -440,7 +440,7 @@ export const TrailCameraGallery: React.FC<TrailCameraGalleryProps> = ({
 
             <button
               onClick={handleDeleteSelected}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
+              className="min-h-11 px-3 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition-colors cursor-pointer flex items-center gap-1.5 shadow-md"
             >
               <Trash2 className="w-3.5 h-3.5" /> Delete ({selectedIds.length})
             </button>

@@ -728,7 +728,7 @@ const cardBgLight = hasCustomBackground
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
               onClick={handleOpenNewLogModal}
-              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
+              className="min-h-11 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs uppercase tracking-wider shadow-lg hover:shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add harvest</span>
@@ -773,7 +773,7 @@ const cardBgLight = hasCustomBackground
         <div className="flex items-center gap-2 mt-5">
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`min-h-11 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'analytics'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : isDark
@@ -787,7 +787,7 @@ const cardBgLight = hasCustomBackground
 
           <button
             onClick={() => setActiveTab('logs')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
+            className={`min-h-11 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'logs'
                 ? 'bg-emerald-600 text-white shadow-md'
                 : isDark

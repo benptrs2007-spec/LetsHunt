@@ -121,7 +121,7 @@ export const TeachingEmptyState: React.FC<TeachingEmptyStateProps> = ({
           {ctaLabel && onCta && (
             <button
               onClick={onCta}
-              className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${ctaBg}`}
+              className={`min-h-11 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${ctaBg}`}
             >
               {ctaLabel} <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -129,7 +129,7 @@ export const TeachingEmptyState: React.FC<TeachingEmptyStateProps> = ({
           {secondaryLabel && onSecondary && (
             <button
               onClick={onSecondary}
-              className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
+              className={`min-h-11 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider border transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${
                 isDark
                   ? 'bg-slate-900/[var(--card-opacity)] border-slate-700 text-slate-300 hover:bg-slate-800'
                   : isHunting

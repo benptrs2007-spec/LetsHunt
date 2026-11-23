@@ -69,8 +69,10 @@ export default function App() {
     // directly for non-standard themes.
     const legacy = safeGetString('letshunt_theme');
     if (legacy === 'olive' || legacy === 'hunting') return legacy;
-    // Legacy: original 'paperback' theme name dropped — fall through to standard.
-    return 'standard';
+    // New visitors land on the rustic Hunter theme — it reads as a field tool
+    // from the first open instead of a generic weather dashboard. Saved
+    // Standard/Olive choices above are always respected.
+    return 'hunting';
   });
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const saved = safeGetString('letshunt_theme_mode');
@@ -298,6 +300,10 @@ export default function App() {
   // Ask once on startup, but only after showing a clear explanation. If the
   // browser already grants location access, no prompt is shown.
   useEffect(() => {
+    // Never stack the location prompt on top of first-run onboarding. When
+    // onboarding closes this effect re-runs and asks in a calm moment.
+    if (isOnboardingOpen) return;
+
     if (!navigator.geolocation) {
       setLocationPermissionState('unsupported');
       return;
@@ -342,7 +348,7 @@ export default function App() {
       cancelled = true;
       if (permissionStatus) permissionStatus.onchange = null;
     };
-  }, []);
+  }, [isOnboardingOpen]);
 
   // Keep a signed-in device's active HuntClub current without making the
   // user remember to press a manual sync button. Local writes are debounced
@@ -652,7 +658,7 @@ export default function App() {
       className={`font-sans antialiased flex flex-col transition-colors duration-200 ${
         activeTab === 'map'
           ? 'h-screen max-h-screen overflow-hidden'
-          : 'min-h-screen pb-14 sm:pb-0'
+          : 'min-h-screen pb-[calc(3.5rem_+_env(safe-area-inset-bottom))] sm:pb-0'
       } ${customBackground ? 'has-custom-background' : ''} ${
         themeMode === 'dark'
           ? themeVariant === 'hunting'
@@ -951,6 +957,10 @@ export default function App() {
                 hasCustomBackground={!!customBackground}
                 lastRefreshed={lastRefreshed}
                 onSwitchToFullDashboard={() => setSimpleDashboard(false)}
+                onOpenFourteenDay={() => {
+                  setIsFourteenDayView(true);
+                  setSelectedDate('');
+                }}
               />
             ) : (
               activeDay && (
@@ -1038,7 +1048,7 @@ export default function App() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsPwaModalOpen(true)}
-                className="text-emerald-600 dark:text-emerald-400 hover:underline font-bold text-xs flex items-center gap-1"
+                className="min-h-11 text-emerald-600 dark:text-emerald-400 hover:underline font-bold text-xs flex items-center gap-1"
               >
                 <Smartphone className="w-3.5 h-3.5" /> Turn Into Web App
               </button>
@@ -1054,7 +1064,7 @@ export default function App() {
       {/* Mobile Bottom Navigation Bar */}
       <nav
         data-bottom-nav="true"
-        className={`sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t flex items-stretch gap-0 px-1.5 py-1 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-colors duration-200 ${
+        className={`safe-bottom sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t flex items-stretch gap-0 px-1.5 py-1 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-colors duration-200 ${
           isDark
             ? themeVariant === 'hunting'
               ? 'bg-slate-950 border-slate-800/60 text-slate-100'
