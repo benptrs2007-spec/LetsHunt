@@ -41,6 +41,9 @@ import {
   Star,
   ArrowRight,
   Lightbulb,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Thermometer,
   MapPin,
 } from 'lucide-react';
@@ -378,6 +381,18 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   const [detailHour, setDetailHour] = useState<number>(() => new Date().getHours());
   // Hero preview hour, driven by the small hourly-card scrubber.
   const [heroHour, setHeroHour] = useState<number>(() => new Date().getHours());
+  // Autoscroll from the hero's Wind tile down to the wind plotter map card.
+  // A plain scrollIntoView would tuck the card under the sticky header, whose
+  // height varies as its contents wrap — so measure the real header and stop
+  // just short of it instead.
+  const scrollToWindMap = () => {
+    const target = document.getElementById('wind-plotter');
+    if (!target) return;
+    const headerHeight = document.querySelector('header')?.getBoundingClientRect().height ?? 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - headerHeight - 8;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
   const today = daily[0];
   // The simple view is a seven-day field plan. Older days stay available via
   // the explicit 14-day outlook link instead of an endless sideways strip.
@@ -411,6 +426,53 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   // The day powering the hourly bar (defaults to today).
   const activeDay = daily.find((d) => d.date === activeDayDate) || today;
 
+  // Next forecast day after the one being viewed — powers the hero's quick
+  // next-day button (hidden entirely on the final day, nothing to advance to).
+  const activeDayIndex = daily.findIndex((d) => d.date === activeDay.date);
+  const nextDay = activeDayIndex >= 0 && activeDayIndex < daily.length - 1
+    ? daily[activeDayIndex + 1]
+    : null;
+
+  // Previous forecast day for the hero's quick back-arrow. The forecast
+  // window always starts today, so the arrow only appears when the hero is
+  // showing a day other than today.
+  const prevDay = activeDayIndex > 0 ? daily[activeDayIndex - 1] : null;
+
+  // Advance the hero — and the hourly chart, pressure graph, and wind map that
+  // all follow the selected day — to the next forecast day. This drives the
+  // same state as tapping a day in the Daily Hunt Score card, and "Back to
+  // Now" (in the hourly card) returns to today's live view.
+  const goToNextDay = () => {
+    if (!nextDay) return;
+    setActiveDayDate(nextDay.date);
+    setHeroHour(new Date().getHours());
+  };
+
+  // Step the hero back to the previous forecast day (the day before the one
+  // being viewed; never shown on today because the forecast starts there).
+  const goToPrevDay = () => {
+    if (!prevDay) return;
+    setActiveDayDate(prevDay.date);
+    setHeroHour(new Date().getHours());
+  };
+
+  // Keep the pressure chart's source hours continuous across midnight. Supply
+  // all remaining forecast days so its 12-hour window can roll past today's
+  // final hour, even when the selected day is near the end of the forecast.
+  const pressureChartDays = daily.slice(Math.max(0, activeDayIndex));
+  const pressureChartHourly = pressureChartDays.flatMap((day) => day.hourly || []);
+  const selectPressureChartHour = (hourIndex: number) => {
+    let remainingIndex = hourIndex;
+    for (const day of pressureChartDays) {
+      if (remainingIndex < day.hourly.length) {
+        if (day.date !== activeDay.date) setActiveDayDate(day.date);
+        setHeroHour(remainingIndex);
+        return;
+      }
+      remainingIndex -= day.hourly.length;
+    }
+  };
+
   // The 24 bars shared by the bar chart and its aligned scrubber track.
   const hourlyBars = activeDay.hourly.slice(0, 24);
 
@@ -428,6 +490,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   const scentDirection = getDownwindText((heroWindDeg + 180) % 360);
   const bestStandForWind = getBestStandForWind(heroWindDeg);
   const isLiveNow = activeDay.date === today.date && heroHour === currentLocalHour;
+  const isNextForecastDayHour = activeDay.date !== today.date;
   const heroScore = heroHourData ? heroHourData.huntScore : activeDay.huntScore;
   const heroRating = getRatingFromScore(heroScore);
   // The hero progress bar uses the exact same scoring shades as the hourly
@@ -508,16 +571,61 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
       {/* 1. Compact hero */}
       <div className={`rounded-3xl border p-4 sm:p-5 shadow-xl relative overflow-hidden desktop-col-span-full ${cardSurface}`}>
         <div className="flex items-center justify-between gap-2 mb-2 sm:mb-3 relative z-10">
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
-            isDark ? 'bg-slate-950/60 border-slate-700 text-slate-200'
-            : theme === 'hunting' ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#2a1b0e]'
-            : theme === 'olive' ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#1e2e1b]'
-            : 'bg-slate-50 border-slate-200 text-slate-700'
-          }`}>
-            <CalendarDays className="w-3 h-3" /> {dayLabel(activeDay)} · {activeDay.dateFormatted}
-          </span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${
+              isDark ? 'bg-slate-950/60 border-slate-700 text-slate-200'
+              : theme === 'hunting' ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#2a1b0e]'
+              : theme === 'olive' ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#1e2e1b]'
+              : 'bg-slate-50 border-slate-200 text-slate-700'
+            }`}>
+              <CalendarDays className="w-3 h-3" /> {dayLabel(activeDay)} · {activeDay.dateFormatted}
+            </span>
+            {/* Quick-advance arrows: peek at the next day's conditions or
+                step back to an earlier day without scrolling down to the day
+                cards. Both hide when there is nothing in that direction
+                (today has no earlier forecast day; the last day has none
+                later). */}
+            {prevDay && (
+              <button
+                type="button"
+                onClick={goToPrevDay}
+                aria-label={`View the previous forecast day's conditions`}
+                title={`View the previous day's conditions`}
+                className={`shrink-0 w-11 h-11 rounded-full border inline-flex items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                  isDark
+                  ? 'bg-slate-950/60 border-slate-700 text-slate-300 hover:text-emerald-300 hover:border-emerald-500/50'
+                  : theme === 'hunting'
+                  ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#7a3208] hover:bg-[#c85a17]/10 hover:border-[#c85a17]/50'
+                  : theme === 'olive'
+                  ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#3d4f21] hover:bg-[#556b2f]/10 hover:border-[#556b2f]/50'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-400/60'
+                }`}
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+            )}
+            {nextDay && (
+              <button
+                type="button"
+                onClick={goToNextDay}
+                aria-label={`View ${nextDay.dayName === 'Tomorrow' ? "tomorrow's" : `${nextDay.dayName}'s`} conditions`}
+                title={`View ${nextDay.dayName === 'Tomorrow' ? "tomorrow's" : `${nextDay.dayName}'s`} conditions`}
+                className={`shrink-0 w-11 h-11 rounded-full border inline-flex items-center justify-center cursor-pointer transition-all hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 ${
+                  isDark
+                  ? 'bg-slate-950/60 border-slate-700 text-slate-300 hover:text-emerald-300 hover:border-emerald-500/50'
+                  : theme === 'hunting'
+                  ? 'bg-[#f4eee1]/80 border-[#d4c4a8] text-[#7a3208] hover:bg-[#c85a17]/10 hover:border-[#c85a17]/50'
+                  : theme === 'olive'
+                  ? 'bg-[#f7f5ed]/90 border-[#d8d2c0] text-[#3d4f21] hover:bg-[#556b2f]/10 hover:border-[#556b2f]/50'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-400/60'
+                }`}
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
           <span className={`text-[10px] font-bold uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-            {isLiveNow ? 'Live conditions' : `${getHour12Label(heroHour)} conditions`}
+            {isLiveNow ? 'Live conditions' : `${isNextForecastDayHour ? `${activeDay.dayName} · ` : ''}${getHour12Label(heroHour)} conditions`}
           </span>
         </div>
         {/* Score progress bar (compact, replaces the dial) */}
@@ -561,23 +669,34 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
             }`}>
               {getWeatherIcon(nowDetails.icon, 'w-8 h-8 sm:w-9 sm:h-9 text-amber-500 shrink-0')}
               <div className="min-w-0">
-                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">{isLiveNow ? 'Now' : getHour12Label(heroHour)}</div>
+                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">{isLiveNow ? 'Now' : `${isNextForecastDayHour ? `${activeDay.dayName} · ` : ''}${getHour12Label(heroHour)}`}</div>
                 <div className="text-xs font-black truncate">{nowDesc}</div>
                 <div className="text-xs font-extrabold">{nowTemp}{tempUnit}</div>
               </div>
             </div>
 
-            {/* Wind */}
-            <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 ${
-              isDark ? 'bg-slate-950/[var(--card-opacity)] border-slate-700/70' : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]' : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]' : 'bg-slate-50 border-slate-200'
-            }`}>
+            {/* Wind — tapping it autoscrolls down to the wind plotter map.
+                Same affordances as the detailed view's Wind tile: lift on
+                hover, sky highlight, and a small chevron hinting "down". */}
+            <button
+              type="button"
+              onClick={scrollToWindMap}
+              aria-label="Scroll down to the wind plotter map"
+              title="View the wind plotter map"
+              className={`group appearance-none text-left rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 cursor-pointer transition-all hover:-translate-y-0.5 hover:border-sky-500/70 hover:shadow-md active:translate-y-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                isDark ? 'bg-slate-950/[var(--card-opacity)] border-slate-700/70' : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]' : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]' : 'bg-slate-50 border-slate-200'
+              }`}>
               <Wind className="w-7 h-7 sm:w-8 sm:h-8 text-sky-500 shrink-0" />
-              <div className="min-w-0">
-                <div className="text-[10px] font-bold uppercase tracking-wider opacity-60">Wind</div>
-                <div className="text-xs font-black truncate">{nowWindText} {nowWindSpeed} {windUnit}</div>
-                <div className="text-[10px] font-semibold opacity-60">scent blows {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</div>
-              </div>
-            </div>
+              <span className="block min-w-0 flex-1">
+                <span className="block text-[10px] font-bold uppercase tracking-wider opacity-60">Wind</span>
+                {/* Direction and speed split across two compact lines so the
+                    full speed value never truncates. */}
+                <span className="block text-xs font-black truncate">{nowWindText}</span>
+                <span className="block text-xs font-black whitespace-nowrap">{nowWindSpeed} {windUnit}</span>
+                <span className="block text-[10px] font-semibold opacity-60 whitespace-nowrap">Scent: {getDownwindText(((heroHourData ? heroHourData.windDirectionDeg : activeDay.windDirectionDeg) + 180) % 360)}</span>
+              </span>
+              <ChevronDown className="w-3.5 h-3.5 shrink-0 text-sky-500 opacity-70 transition-transform group-hover:translate-y-0.5" aria-hidden="true" />
+            </button>
 
             {/* Sunrise */}
             <div className={`rounded-xl border p-2.5 sm:p-3 flex items-center gap-2 min-w-0 ${
@@ -791,7 +910,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               onChange={(e) => setHeroHour(parseInt(e.target.value, 10))}
               aria-label="Hourly hunt score slider"
               aria-valuetext={`${getHour12Label(heroHour)} — hunt score ${heroScore}, ${getRatingFromScore(heroScore)}`}
-              className="absolute inset-0 w-full h-full appearance-none opacity-0 cursor-pointer z-20"
+              className="absolute inset-0 w-full h-full appearance-none opacity-0 cursor-pointer z-20 touch-none"
             />
           </div>
         </div>
@@ -1013,16 +1132,16 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
 
       {/* 4. Selected day pressure + precipitation */}
       <PressureChart
-        hourly={activeDay.hourly}
+        hourly={pressureChartHourly}
         units={units}
         pressureUnit={pressureUnit}
         theme={theme}
         isDark={isDark}
         hasCustomBackground={hasCustomBackground}
         selectedHour={heroHour}
-        onSelectHour={setHeroHour}
-        selectedDayName={activeDay.dayName}
-        selectedDateFormatted={activeDay.dateFormatted}
+        onSelectHour={selectPressureChartHour}
+        selectedDayName={isNextForecastDayHour ? activeDay.dayName : undefined}
+        selectedDateFormatted={isNextForecastDayHour ? activeDay.dateFormatted : undefined}
       />
 
       {/* 5. Satellite wind map with scent cone, following the selected day + hour */}

@@ -229,15 +229,21 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       aria-checked={checked}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={`relative w-11 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ${
-        checked ? 'bg-emerald-500' : disabled ? (isDark ? 'bg-slate-800' : 'bg-slate-200') : isDark ? 'bg-slate-700' : 'bg-slate-300'
-      } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+      className={`relative w-11 h-11 flex items-center justify-center flex-shrink-0 ${
+        disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+      }`}
     >
       <span
-        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
-          checked ? 'translate-x-5' : 'translate-x-0'
+        className={`relative block w-11 h-6 rounded-full transition-colors duration-200 ${
+          checked ? 'bg-emerald-500' : disabled ? (isDark ? 'bg-slate-800' : 'bg-slate-200') : isDark ? 'bg-slate-700' : 'bg-slate-300'
         }`}
-      />
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-200 ${
+            checked ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </span>
     </button>
   );
 
