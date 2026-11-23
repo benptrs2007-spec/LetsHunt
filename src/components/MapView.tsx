@@ -2858,7 +2858,7 @@ export const MapView: React.FC<MapViewProps> = ({
                           x={0}
                           y={3}
                           textAnchor="middle"
-                          fill={isDark ? '#f8fafc' : '#0f172a'}
+                          fill="rgb(var(--ui-text-rgb))"
                           fontSize={10}
                           fontWeight="bold"
                         >
@@ -2980,7 +2980,7 @@ export const MapView: React.FC<MapViewProps> = ({
                           x={0}
                           y={3}
                           textAnchor="middle"
-                          fill={isDark ? '#f8fafc' : '#0f172a'}
+                          fill="rgb(var(--ui-text-rgb))"
                           fontSize={10}
                           fontWeight="bold"
                         >
@@ -3137,12 +3137,12 @@ export const MapView: React.FC<MapViewProps> = ({
                           to a subtle rim so the droplets stay visible over bright map tiles too. */}
                       <path
                         d={dropletPath(s.len, Math.min((s.width + 3) * 1.3, s.len * 0.4), Math.min((s.width + 3) * 0.8, s.len * 0.3))}
-                        fill="#082f49"
+                        fill="rgb(var(--ui-info-text-rgb))"
                         fillOpacity={0.4}
                       />
                       <path
                         d={dropletPath(s.len, Math.min((s.width + 1) * 1.3, s.len * 0.4), Math.min((s.width + 1) * 0.8, s.len * 0.3))}
-                        fill="#f8fafc"
+                        fill="rgb(var(--ui-surface-rgb))"
                         fillOpacity={0.6}
                       />
                     </g>
@@ -4207,7 +4207,7 @@ export const MapView: React.FC<MapViewProps> = ({
                   value={selectedHour}
                   onChange={(e) => setSelectedHour(parseInt(e.target.value, 10))}
                   className={`flex-1 min-w-0 accent-emerald-500 cursor-pointer h-1 border rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}
-                  style={{ backgroundColor: isDark ? '#334155' : '#cbd5e1' }}
+                  style={{ backgroundColor: 'rgb(var(--ui-border-rgb) / 0.9)' }}
                   aria-label="Hourly weather slider"
                 />
                 <button
@@ -4396,7 +4396,7 @@ export const MapView: React.FC<MapViewProps> = ({
                           value={selectedHour}
                           onChange={(e) => setSelectedHour(parseInt(e.target.value, 10))}
                           className={`flex-1 min-w-0 accent-emerald-500 cursor-pointer h-1 border rounded-full ${isDark ? 'bg-slate-700' : 'bg-slate-300'}`}
-                          style={{ backgroundColor: isDark ? '#334155' : '#cbd5e1' }}
+                          style={{ backgroundColor: 'rgb(var(--ui-border-rgb) / 0.9)' }}
                           aria-label="Hourly weather slider"
                         />
                       </div>
@@ -5147,7 +5147,7 @@ export const MapView: React.FC<MapViewProps> = ({
                 }`}>
                   <div className="relative w-16 h-16 flex-shrink-0 flex items-center justify-center bg-slate-900 rounded-full border border-slate-700 shadow-inner">
                     <svg viewBox="0 0 100 100" className="w-full h-full">
-                      <circle cx="50" cy="50" r="46" fill="none" stroke="#334155" strokeWidth="2" />
+                      <circle cx="50" cy="50" r="46" fill="none" stroke="rgb(var(--ui-border-rgb))" strokeWidth="2" />
                       {(() => {
                         const downwind = (editPreferredWindDeg + 180) % 360;
                         const startAngle = (downwind - 70 + 360) % 360;
@@ -5162,10 +5162,10 @@ export const MapView: React.FC<MapViewProps> = ({
                           />
                         );
                       })()}
-                      <text x="50" y="15" textAnchor="middle" fill="#94a3b8" fontSize="10" fontWeight="900">N</text>
-                      <text x="88" y="53" textAnchor="middle" fill="#94a3b8" fontSize="10" fontWeight="900">E</text>
-                      <text x="50" y="92" textAnchor="middle" fill="#94a3b8" fontSize="10" fontWeight="900">S</text>
-                      <text x="12" y="53" textAnchor="middle" fill="#94a3b8" fontSize="10" fontWeight="900">W</text>
+                      <text x="50" y="15" textAnchor="middle" fill="rgb(var(--ui-muted-rgb))" fontSize="10" fontWeight="900">N</text>
+                      <text x="88" y="53" textAnchor="middle" fill="rgb(var(--ui-muted-rgb))" fontSize="10" fontWeight="900">E</text>
+                      <text x="50" y="92" textAnchor="middle" fill="rgb(var(--ui-muted-rgb))" fontSize="10" fontWeight="900">S</text>
+                      <text x="12" y="53" textAnchor="middle" fill="rgb(var(--ui-muted-rgb))" fontSize="10" fontWeight="900">W</text>
                       
                       <circle cx="50" cy="50" r="4" fill="#10b981" />
                       {(() => {

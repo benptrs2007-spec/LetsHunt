@@ -339,7 +339,7 @@ export const PressureChart: React.FC<PressureChartProps> = ({
                 y1={y}
                 x2={width - paddingRight}
                 y2={y}
-                stroke={isDark ? '#334155' : '#e2e8f0'}
+                stroke="rgb(var(--ui-border-rgb) / 0.8)"
                 strokeDasharray="3 3"
                 strokeWidth="1"
               />
@@ -424,7 +424,7 @@ export const PressureChart: React.FC<PressureChartProps> = ({
                 cy={pt.yPrecip}
                 r={isHovered ? 6 : pt.precipProb > 30 ? 4 : 2.5}
                 fill="#06b6d4"
-                stroke={isDark ? '#0f172a' : '#ffffff'}
+                stroke="rgb(var(--ui-surface-rgb))"
                 strokeWidth={1.5}
               />
 
@@ -434,7 +434,7 @@ export const PressureChart: React.FC<PressureChartProps> = ({
                 cy={pt.yP}
                 r={isHovered ? 6.5 : pt.isPrime ? 4.5 : 3}
                 fill={pt.isPrime ? '#10b981' : '#f59e0b'}
-                stroke={isDark ? '#0f172a' : '#ffffff'}
+                stroke="rgb(var(--ui-surface-rgb))"
                 strokeWidth={1.5}
               />
 
@@ -443,7 +443,7 @@ export const PressureChart: React.FC<PressureChartProps> = ({
                 <text
                   x={pt.x}
                   y={height - 12}
-                  fill={isDark ? '#e2e8f0' : '#334155'}
+                  fill="rgb(var(--ui-text-rgb))"
                   fontSize="15"
                   fontWeight="800"
                   textAnchor="middle"

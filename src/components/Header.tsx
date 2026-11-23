@@ -337,15 +337,8 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Desktop separator between left controls and nav tabs. Hidden at
               lg+ where the left navigation rail owns navigation and this
               header reduces to search + location controls. */}
-          <div className="hidden sm:block lg:hidden w-px self-stretch my-1.5 flex-shrink-0" style={{
-            backgroundColor: isDark
-              ? 'rgba(148,163,184,0.15)'
-              : theme === 'hunting'
-              ? 'rgba(42,27,14,0.1)'
-              : theme === 'olive'
-              ? 'rgba(30,46,27,0.1)'
-              : 'rgba(148,163,184,0.2)',
-          }} />
+          <div className="hidden sm:block lg:hidden w-px self-stretch my-1.5 flex-shrink-0"
+            style={{ backgroundColor: 'rgb(var(--ui-border-rgb) / 0.7)' }} />
 
           {/* Right: Navigation Tabs (visible from sm / 640px+).
               Hidden at lg+ (1024px+) where DesktopRail provides the same five

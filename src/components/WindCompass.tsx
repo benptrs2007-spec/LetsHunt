@@ -428,7 +428,7 @@ export const WindCompass: React.FC<WindCompassProps> = ({
                   }}
                   onError={(e) => {
                     // Fallback visual gray tile in case server tile fails to render
-                    e.currentTarget.style.backgroundColor = isDark ? '#1e293b' : '#f1f5f9';
+                    e.currentTarget.style.backgroundColor = 'rgb(var(--ui-surface-rgb))';
                   }}
                 />
               ))}

@@ -1229,7 +1229,7 @@ export default function App() {
                 <button
                   onClick={requestLocationAccess}
                   disabled={isRequestingLocation}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-60"
+                  className="flex-1 min-h-11 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 disabled:opacity-60"
                 >
                   {isRequestingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
                   {isRequestingLocation ? 'Checking...' : locationPermissionState === 'denied' ? 'Try Again' : 'Allow Location'}
@@ -1237,7 +1237,7 @@ export default function App() {
               )}
               <button
                 onClick={() => setIsLocationPromptOpen(false)}
-                className={`px-4 py-2.5 rounded-xl border text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 ${
+                className={`min-h-11 px-4 py-2.5 rounded-xl border text-xs font-black uppercase tracking-wider flex items-center justify-center gap-1.5 ${
                   isDark ? 'border-slate-700 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                 }`}
               >

@@ -57,8 +57,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
             textAlign: 'center',
             fontFamily:
               'system-ui, -apple-system, Segoe UI, Roboto, sans-serif',
-            background: '#0f172a',
-            color: '#f1f5f9',
+            background: 'rgb(var(--ui-surface-rgb))',
+            color: 'rgb(var(--ui-text-rgb))',
           }}
         >
           <div
@@ -66,15 +66,15 @@ export class ErrorBoundary extends React.Component<Props, State> {
               maxWidth: 480,
               padding: 32,
               borderRadius: 16,
-              background: '#1e293b',
-              border: '1px solid #334155',
+              background: 'rgb(var(--ui-surface-soft-rgb))',
+              border: '1px solid rgb(var(--ui-border-rgb))',
               boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
             }}
           >
             <h1 style={{ fontSize: 22, fontWeight: 800, marginBottom: 8 }}>
               Something went wrong
             </h1>
-            <p style={{ fontSize: 14, color: '#cbd5e1', marginBottom: 8 }}>
+            <p style={{ fontSize: 14, color: 'rgb(var(--ui-muted-rgb))', marginBottom: 8 }}>
               Your saved data is safe. Reload to continue.
             </p>
             {this.state.errorMessage && (
@@ -83,7 +83,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                   marginTop: 12,
                   marginBottom: 20,
                   fontSize: 12,
-                  color: '#94a3b8',
+                  color: 'rgb(var(--ui-muted-rgb))',
                   textAlign: 'left',
                 }}
               >
@@ -94,7 +94,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
                   style={{
                     marginTop: 8,
                     padding: 12,
-                    background: '#0f172a',
+                    background: 'rgb(var(--ui-surface-rgb))',
                     borderRadius: 8,
                     overflow: 'auto',
                     maxHeight: 200,
@@ -113,8 +113,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
                   padding: '12px 20px',
                   fontWeight: 700,
                   fontSize: 14,
-                  color: '#0f172a',
-                  background: '#10b981',
+                  color: 'rgb(var(--ui-surface-rgb))',
+                  background: 'rgb(var(--ui-accent-rgb))',
                   border: 'none',
                   borderRadius: 10,
                   cursor: 'pointer',
@@ -127,9 +127,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
                 style={{
                   padding: '10px 16px',
                   fontSize: 12,
-                  color: '#94a3b8',
+                  color: 'rgb(var(--ui-muted-rgb))',
                   background: 'transparent',
-                  border: '1px solid #475569',
+                  border: '1px solid rgb(var(--ui-border-rgb))',
                   borderRadius: 8,
                   cursor: 'pointer',
                 }}

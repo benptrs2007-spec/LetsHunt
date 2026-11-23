@@ -419,7 +419,7 @@ export const DayDetailView: React.FC<DayDetailViewProps> = ({
           variant="wash"
           opacity={0.08}
           blendMode="soft-light"
-          tone={isDark ? '#94a3b8' : '#94a3b8'}
+          tone="rgb(var(--ui-muted-rgb))"
           className="absolute -top-4 -right-6 w-56 h-28"
         />
 
@@ -449,7 +449,7 @@ export const DayDetailView: React.FC<DayDetailViewProps> = ({
                     cy="50"
                     r="40"
                     fill="transparent"
-                    stroke={isDark ? (theme === 'hunting' ? '#4a3320' : '#1e293b') : theme === 'hunting' ? '#d4c4a8' : theme === 'olive' ? '#ded8c8' : '#e2e8f0'}
+                    stroke="rgb(var(--ui-border-rgb))"
                     strokeWidth="8"
                   />
                   {/* Colored Indicator */}

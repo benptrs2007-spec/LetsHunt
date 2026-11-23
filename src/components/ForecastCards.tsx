@@ -613,7 +613,7 @@ const getScoreBadgeColor = (score: number) => {
                 variant="fibers"
                 opacity={0.18}
                 blendMode="soft-light"
-                tone={isDark ? '#94a3b8' : '#94a3b8'}
+                tone="rgb(var(--ui-muted-rgb))"
                 className="absolute inset-0 pointer-events-none rounded-2xl"
               />
 

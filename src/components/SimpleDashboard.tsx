@@ -381,6 +381,9 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   const [detailHour, setDetailHour] = useState<number>(() => new Date().getHours());
   // Hero preview hour, driven by the small hourly-card scrubber.
   const [heroHour, setHeroHour] = useState<number>(() => new Date().getHours());
+  // Field Plan stays compact in the field; the full tactical breakdown is one
+  // deliberate tap away instead of pushing the hourly chart down the phone.
+  const [fieldPlanOpen, setFieldPlanOpen] = useState(false);
   // Autoscroll from the hero's Wind tile down to the wind plotter map card.
   // A plain scrollIntoView would tuck the card under the sticky header, whose
   // height varies as its contents wrap — so measure the real header and stop
@@ -497,9 +500,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
   // and daily bar graphs, so a score reads the same color everywhere.
   const stroke = getScoreBarColor(heroScore);
   // Muted track behind the score fill (matches the old dial's ring background).
-  const trackColor = isDark
-    ? theme === 'hunting' ? '#4a3320' : theme === 'olive' ? '#2a3620' : '#1e293b'
-    : theme === 'hunting' ? '#d4c4a8' : theme === 'olive' ? '#ded8c8' : '#e2e8f0';
+  const trackColor = 'rgb(var(--ui-border-rgb) / 0.8)';
   const nowDetails = heroHourData ? getWeatherDetails(heroHourData.weatherCode) : getWeatherDetails(activeDay.weatherCode);
   // Keep the hero's condition badge compact: rain-break hours read as the
   // short "Rain Break" label.
@@ -722,41 +723,52 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
           </div>
       </div>
 
-      {/* Field plan — the tactical advice used to hide behind a "Hunt Tip"
-          badge. It gets a full card near the hero because it is the most
-          actionable thing in the forecast. */}
-      <div className={`rounded-2xl border p-4 sm:p-5 shadow-lg ${cardSurface} desktop-col-span-full`}>
-        <div className="flex items-start gap-3">
-          <div className={`w-11 h-11 rounded-2xl border flex items-center justify-center shrink-0 ${
-            isDark ? 'bg-amber-500/15 border-amber-500/30' : 'bg-amber-500/15 border-amber-500/40'
-          }`}>
-            <Lightbulb className="w-5 h-5 text-amber-500" />
-          </div>
-          <div className="min-w-0 flex-1 space-y-2.5">
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-wider text-amber-500">
-                Field Plan · {dayLabel(activeDay)} · {isLiveNow ? 'Now' : getHour12Label(heroHour)}
-              </div>
-              <p className={`mt-0.5 text-sm sm:text-[15px] font-bold leading-snug ${
-                isDark ? 'text-slate-100' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
-              }`}>
-                {activeTips[0]}
-              </p>
+      {/* Field plan — compact by default so the next decision is visible
+          without scrolling. Tap once to open the full tactical note; every
+          color comes from the active theme tokens below. */}
+      <div className="rounded-2xl border p-3 sm:p-4 shadow-md fp-surface fp-border desktop-col-span-full">
+        <button
+          type="button"
+          onClick={() => setFieldPlanOpen((open) => !open)}
+          aria-expanded={fieldPlanOpen}
+          aria-controls="field-plan-detail"
+          className="w-full min-h-11 flex items-center gap-3 text-left rounded-xl px-1 py-1 fp-hover fp-focus"
+        >
+          <span className="w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 fp-badge">
+            <Lightbulb className="w-4 h-4 fp-warm" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-center gap-2 min-w-0">
+              <span className="text-[10px] font-black uppercase tracking-wider shrink-0 fp-warm">
+                Field Plan
+              </span>
+              <span className="text-[10px] font-bold truncate fp-muted">
+                {dayLabel(activeDay)} · {isLiveNow ? 'Now' : getHour12Label(heroHour)}
+              </span>
+            </span>
+            <span className="block mt-0.5 text-xs sm:text-sm font-bold leading-snug truncate fp-text">
+              {activeTips[0]}
+            </span>
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 shrink-0 fp-muted transition-transform ${fieldPlanOpen ? 'rotate-180' : ''}`}
+            aria-hidden="true"
+          />
+        </button>
+        {fieldPlanOpen && (
+          <div id="field-plan-detail" className="mt-2 rounded-xl border p-3 fp-panel fp-border">
+            <div className="space-y-1.5">
+              {activeTips.map((tip) => (
+                <p key={tip} className="text-xs sm:text-sm font-bold leading-snug fp-text">{tip}</p>
+              ))}
             </div>
-            <div className={`rounded-xl border px-3 py-2.5 flex items-start gap-2 ${
-              isDark ? 'bg-slate-950/50 border-slate-700/70'
-                : theme === 'hunting' ? 'bg-[#f4eee1]/70 border-[#d4c4a8]'
-                : theme === 'olive' ? 'bg-[#f7f5ed]/80 border-[#d8d2c0]'
-                : 'bg-slate-50 border-slate-200'
-            }`}>
-              <Wind className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" />
+            <div className="mt-2 flex items-start gap-2">
+              <Wind className="w-4 h-4 mt-0.5 shrink-0 fp-info" />
               <div className="min-w-0">
-                <div className={`text-[10px] font-black uppercase tracking-wider ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <div className="text-[10px] font-black uppercase tracking-wider fp-muted">
                   Scent &amp; stand
                 </div>
-                <div className={`text-xs sm:text-sm font-bold leading-snug ${
-                  isDark ? 'text-slate-100' : theme === 'hunting' ? 'text-[#2a1b0e]' : theme === 'olive' ? 'text-[#1e2e1b]' : 'text-slate-900'
-                }`}>
+                <div className="text-xs font-bold leading-snug fp-text">
                   Wind {windDirectionText} · scent {scentDirection}.{' '}
                   {bestStandForWind
                     ? `Best match: ${bestStandForWind.name} (${bestStandForWind.idealWind}).`
@@ -765,7 +777,7 @@ export const SimpleDashboard: React.FC<SimpleDashboardProps> = ({
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* 2. Hourly hunt score bar */}

@@ -407,7 +407,7 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
               className="absolute border-none select-none"
               style={{ left: `${tile.left}px`, top: `${tile.top}px`, width: '256px', height: '256px' }}
               onError={(e) => {
-                e.currentTarget.style.backgroundColor = isDark ? '#1e293b' : '#e2e8f0';
+                e.currentTarget.style.backgroundColor = 'rgb(var(--ui-surface-rgb))';
               }}
             />
           ))}
@@ -440,12 +440,12 @@ export const SimpleWindMap: React.FC<SimpleWindMapProps> = ({
                       satellite tiles. */}
                   <path
                     d={dropletPath(s.len, Math.min((s.width + 3) * 1.3, s.len * 0.4), Math.min((s.width + 3) * 0.8, s.len * 0.3))}
-                    fill="#082f49"
+                    fill="rgb(var(--ui-info-text-rgb))"
                     fillOpacity={0.4}
                   />
                   <path
                     d={dropletPath(s.len, Math.min((s.width + 1) * 1.3, s.len * 0.4), Math.min((s.width + 1) * 0.8, s.len * 0.3))}
-                    fill="#f8fafc"
+                    fill="rgb(var(--ui-surface-rgb))"
                     fillOpacity={0.6}
                   />
                 </g>

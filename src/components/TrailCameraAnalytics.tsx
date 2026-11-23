@@ -190,8 +190,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byHourOfDay} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} interval={3} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} interval={3} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -208,8 +208,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byWindDirection} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} interval={1} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} interval={1} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -226,8 +226,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byWindSpeed} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#06b6d4" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -244,8 +244,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byTemperatureRange} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#f43f5e" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -262,8 +262,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byPressureRange} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={8} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={8} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -280,8 +280,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byMoonPhase} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={8} interval={0} angle={-20} textAnchor="end" height={35} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={8} interval={0} angle={-20} textAnchor="end" height={35} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -298,8 +298,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-48 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byMonth} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" fill="#10b981" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -316,8 +316,8 @@ export const TrailCameraAnalytics: React.FC<TrailCameraAnalyticsProps> = ({
               <div className="h-56 w-full pt-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={activeAnalytics.byWeatherCondition.slice(0, 8)} margin={{ top: 5, right: 10, left: -10, bottom: 15 }}>
-                    <XAxis dataKey="name" stroke="#94a3b8" fontSize={9} angle={-15} textAnchor="end" interval={0} />
-                    <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} />
+                    <XAxis dataKey="name" stroke="rgb(var(--ui-muted-rgb))" fontSize={9} angle={-15} textAnchor="end" interval={0} />
+                    <YAxis stroke="rgb(var(--ui-muted-rgb))" fontSize={10} allowDecimals={false} />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                       {activeAnalytics.byWeatherCondition.slice(0, 8).map((_, index) => (

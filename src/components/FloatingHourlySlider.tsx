@@ -99,17 +99,10 @@ export const FloatingHourlySlider: React.FC<FloatingHourlySliderProps> = ({
     : theme === 'olive' ? 'bg-[#cbd5a8] border-[#7d8d55]'
     : 'bg-slate-200 border-slate-400';
 
-  const sliderTrackStyle = isDark
-    ? theme === 'hunting'
-      ? { backgroundColor: '#3a332a', borderColor: '#655745' }
-      : theme === 'olive'
-      ? { backgroundColor: '#26351b', borderColor: '#465b2d' }
-      : { backgroundColor: '#1e293b', borderColor: '#475569' }
-    : theme === 'hunting'
-    ? { backgroundColor: '#d6b98f', borderColor: '#a47b4e' }
-    : theme === 'olive'
-    ? { backgroundColor: '#cbd5a8', borderColor: '#7d8d55' }
-    : { backgroundColor: '#e2e8f0', borderColor: '#94a3b8' };
+  const sliderTrackStyle = {
+    backgroundColor: 'rgb(var(--ui-surface-soft-rgb))',
+    borderColor: 'rgb(var(--ui-border-rgb))',
+  };
 
   const sliderAccentTextClass = isDark
     ? theme === 'hunting' ? 'text-[#e08a5a]' : theme === 'olive' ? 'text-[#a8c078]' : 'text-emerald-400'

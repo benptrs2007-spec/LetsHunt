@@ -26,21 +26,11 @@ export function buildThemedLogo(
   const logoAccent =
     theme === 'hunting'
       ? isDark
-        ? '#c77942'
-        : '#c85a17'
-      : theme === 'olive'
-      ? '#556b2f'
-      : '#10b981';
+        ? 'rgb(var(--ui-warm-text-rgb))'
+        : 'rgb(var(--ui-warm-rgb))'
+      : 'rgb(var(--ui-accent-rgb))';
 
-  const logoText = isDark
-    ? theme === 'hunting'
-      ? '#e8dfd2'
-      : '#ffffff'
-    : theme === 'hunting'
-    ? '#2a1b0e'
-    : theme === 'olive'
-    ? '#1e2e1b'
-    : '#0f172a';
+  const logoText = 'rgb(var(--ui-text-rgb))';
 
   return horizontalLogoRaw
     .replace('<svg ', `<svg class="${sizeClass}" `)

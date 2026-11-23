@@ -206,9 +206,7 @@ export const DetailedPredictionView: React.FC<DetailedPredictionViewProps> = ({
   };
 
   const stroke = getScoreColor(activeScore);
-  const trackColor = isDark
-    ? theme === 'hunting' ? '#4a3320' : theme === 'olive' ? '#2a3620' : '#1e293b'
-    : theme === 'hunting' ? '#d4c4a8' : theme === 'olive' ? '#ded8c8' : '#e2e8f0';
+  const trackColor = 'rgb(var(--ui-border-rgb) / 0.8)';
 
   // The hovered/selected hour drives the details card under the bars.
   const activeIdx = hoveredHourIdx !== null ? hoveredHourIdx : selectedHour;

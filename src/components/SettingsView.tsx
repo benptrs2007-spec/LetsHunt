@@ -308,7 +308,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
           variant="wash"
           opacity={0.06}
           blendMode="soft-light"
-          tone={isDark ? '#94a3b8' : '#94a3b8'}
+          tone="rgb(var(--ui-muted-rgb))"
           className="absolute inset-x-0 top-0 h-12"
         />
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">

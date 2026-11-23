@@ -68,16 +68,16 @@ button, a, input, select, textarea {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: rgb(var(--ui-border-rgb) / 0.8);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: rgb(var(--ui-border-rgb));
 }
 
-/* Dark scrollbar */
+/* Every mode reads the same semantic token; no separate slate scrollbar. */
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(71, 85, 105, 0.5);
+  background: rgb(var(--ui-border-rgb) / 0.9);
 }
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(71, 85, 105, 0.7);
@@ -111,12 +111,12 @@ button, a, input, select, textarea {
   bottom: 2px;
   width: 3px;
   border-radius: 2px;
-  background: linear-gradient(to bottom, #10b981, #059669);
+  background: linear-gradient(to bottom, rgb(var(--ui-accent-rgb)), rgb(var(--ui-accent-text-rgb)));
 }
 
 /* Selection color consistency */
 ::selection {
-  background: rgba(16, 185, 129, 0.3);
+  background: rgb(var(--ui-accent-rgb) / 0.3);
   color: inherit;
 }
 
@@ -140,7 +140,7 @@ button, a, input, select, textarea {
     height: 6px;
     border-radius: 3px;
     outline: none;
-    background-color: rgba(148, 163, 184, 0.4);
+    background-color: rgb(var(--ui-border-rgb) / 0.7);
   }
 }
 input[type="range"]::-webkit-slider-thumb {
@@ -149,9 +149,9 @@ input[type="range"]::-webkit-slider-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #10b981;
+  background: rgb(var(--ui-accent-rgb));
   cursor: pointer;
-  border: 2px solid white;
+  border: 2px solid rgb(var(--ui-surface-rgb));
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.15s ease;
 }
@@ -163,20 +163,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
 input[type="range"]::-moz-range-track {
   height: 6px;
   border-radius: 3px;
-  background-color: rgba(148, 163, 184, 0.4);
+  background-color: rgb(var(--ui-border-rgb) / 0.7);
 }
 input[type="range"]::-moz-range-progress {
   height: 6px;
   border-radius: 3px;
-  background-color: #10b981;
+  background-color: rgb(var(--ui-accent-rgb));
 }
 input[type="range"]::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #10b981;
+  background: rgb(var(--ui-accent-rgb));
   cursor: pointer;
-  border: 2px solid white;
+  border: 2px solid rgb(var(--ui-surface-rgb));
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
@@ -908,29 +908,295 @@ rect:focus {
   color: #f4eee1 !important;
 }
 
+/* =====================================================================
+   UNIFIED THEME TOKENS + FULL UTILITY COVERAGE
+   =====================================================================
+   Every variant/mode now publishes the same semantic palette. New UI (the
+   compact Field Plan below) reads these tokens directly, and the utility
+   pass that follows re-tints legacy Tailwind colors so olive/hunting stay
+   on-palette in BOTH light and dark — including plain `bg-white` /
+   `bg-slate-50` call sites the earlier slash-only rules could not reach. */
+:root {
+  --ui-surface-rgb: 255 255 255;
+  --ui-surface-soft-rgb: 248 250 252;
+  --ui-dark-surface-rgb: 2 6 23;
+  --ui-border-rgb: 203 213 225;
+  --ui-text-rgb: 15 23 42;
+  --ui-muted-rgb: 100 116 139;
+  --ui-accent-rgb: 16 185 129;
+  --ui-accent-text-rgb: 4 120 87;
+  --ui-warm-rgb: 217 119 6;
+  --ui-warm-text-rgb: 180 83 9;
+  --ui-info-rgb: 14 165 233;
+  --ui-info-text-rgb: 2 132 199;
+}
+
+.dark {
+  --ui-surface-rgb: 15 23 42;
+  --ui-surface-soft-rgb: 2 6 23;
+  --ui-dark-surface-rgb: 2 6 23;
+  --ui-border-rgb: 51 65 85;
+  --ui-text-rgb: 241 245 249;
+  --ui-muted-rgb: 148 163 184;
+  --ui-accent-rgb: 16 185 129;
+  --ui-accent-text-rgb: 52 211 153;
+  --ui-warm-rgb: 245 158 11;
+  --ui-warm-text-rgb: 251 191 36;
+  --ui-info-rgb: 14 165 233;
+  --ui-info-text-rgb: 56 189 248;
+}
+
+.olive:not(.dark) {
+  --ui-surface-rgb: 247 245 237;
+  --ui-surface-soft-rgb: 239 235 217;
+  --ui-dark-surface-rgb: 31 45 23;
+  --ui-border-rgb: 207 213 186;
+  --ui-text-rgb: 30 46 27;
+  --ui-muted-rgb: 91 105 76;
+  --ui-accent-rgb: 85 107 47;
+  --ui-accent-text-rgb: 63 90 43;
+  --ui-warm-rgb: 180 140 60;
+  --ui-warm-text-rgb: 107 79 32;
+  --ui-info-rgb: 74 127 135;
+  --ui-info-text-rgb: 47 95 103;
+}
+
+.dark.olive {
+  --ui-surface-rgb: 31 45 23;
+  --ui-surface-soft-rgb: 24 34 18;
+  --ui-dark-surface-rgb: 24 34 18;
+  --ui-border-rgb: 61 82 48;
+  --ui-text-rgb: 221 230 205;
+  --ui-muted-rgb: 167 181 150;
+  --ui-accent-rgb: 129 158 86;
+  --ui-accent-text-rgb: 190 208 160;
+  --ui-warm-rgb: 130 100 45;
+  --ui-warm-text-rgb: 202 163 92;
+  --ui-info-rgb: 76 126 130;
+  --ui-info-text-rgb: 139 190 190;
+}
+
+.hunting:not(.dark) {
+  --ui-surface-rgb: 244 238 225;
+  --ui-surface-soft-rgb: 234 225 207;
+  --ui-dark-surface-rgb: 45 38 30;
+  --ui-border-rgb: 212 196 168;
+  --ui-text-rgb: 42 27 14;
+  --ui-muted-rgb: 122 101 80;
+  --ui-accent-rgb: 85 107 47;
+  --ui-accent-text-rgb: 85 107 47;
+  --ui-warm-rgb: 200 90 23;
+  --ui-warm-text-rgb: 122 50 8;
+  --ui-info-rgb: 63 127 135;
+  --ui-info-text-rgb: 36 88 94;
+}
+
+.dark.hunting {
+  --ui-surface-rgb: 45 38 30;
+  --ui-surface-soft-rgb: 35 30 24;
+  --ui-dark-surface-rgb: 35 30 24;
+  --ui-border-rgb: 91 76 58;
+  --ui-text-rgb: 232 223 210;
+  --ui-muted-rgb: 169 153 136;
+  --ui-accent-rgb: 85 107 47;
+  --ui-accent-text-rgb: 216 200 168;
+  --ui-warm-rgb: 154 87 47;
+  --ui-warm-text-rgb: 208 138 77;
+  --ui-info-rgb: 74 111 113;
+  --ui-info-text-rgb: 150 190 190;
+}
+
+/* Field Plan building blocks. All colors resolve from the active variant. */
+.fp-surface { background-color: rgb(var(--ui-surface-rgb) / var(--card-opacity, 0.92)); }
+.fp-panel { background-color: rgb(var(--ui-surface-soft-rgb) / var(--card-opacity, 0.92)); }
+.fp-border { border-color: rgb(var(--ui-border-rgb) / 0.85); }
+.fp-text { color: rgb(var(--ui-text-rgb)); }
+.fp-muted { color: rgb(var(--ui-muted-rgb)); }
+.fp-warm { color: rgb(var(--ui-warm-text-rgb)); }
+.fp-info { color: rgb(var(--ui-info-text-rgb)); }
+.fp-badge {
+  background-color: rgb(var(--ui-warm-rgb) / 0.14);
+  border-color: rgb(var(--ui-warm-rgb) / 0.38);
+}
+.fp-hover { transition: background-color 150ms ease; }
+.fp-hover:hover { background-color: rgb(var(--ui-surface-rgb) / calc(var(--card-opacity, 0.92) * 1.08)); }
+.fp-focus:focus-visible { outline: 2px solid rgb(var(--ui-accent-rgb)); outline-offset: 2px; }
+
+/* Neutral surfaces: catch plain utilities the previous slash-only rules
+   missed (`bg-white`, `bg-slate-50`) as well as every opacity variant. */
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-white"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-50"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-100"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-200"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-white/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-50/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-100/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-200/"] {
+  background-color: rgb(var(--ui-surface-rgb) / var(--card-opacity, 0.92)) !important;
+}
+
+/* Dark utility chips inside a light themed screen (GPS/hour controls) keep
+   their "raised control" look, but adopt the variant's dark surface instead
+   of staying blue-slate. */
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-800"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-900"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="bg-slate-950"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-700/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-800/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-900/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="bg-slate-950/"] {
+  background-color: rgb(var(--ui-dark-surface-rgb) / var(--card-opacity, 0.92)) !important;
+}
+
+:is(.dark.olive, .dark.hunting) [class~="bg-white"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-50"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-100"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-200"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-700"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-800"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-900"],
+:is(.dark.olive, .dark.hunting) [class~="bg-slate-950"],
+:is(.dark.olive, .dark.hunting) [class*="bg-white/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-50/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-100/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-200/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-700/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-800/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-900/"],
+:is(.dark.olive, .dark.hunting) [class*="bg-slate-950/"] {
+  background-color: rgb(var(--ui-surface-rgb) / var(--card-opacity, 0.92)) !important;
+}
+
+/* Borders and dividers follow the same palette in every mode. */
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-slate-"] {
+  border-color: rgb(var(--ui-border-rgb) / 0.8) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="divide-slate-"] > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(var(--ui-border-rgb) / 0.75) !important;
+}
+
+/* Neutral text: light variants darken the primary steps and mute the
+   secondary steps; dark variants do the inverse. */
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-950"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-900"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-800"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-700"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-950/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-900/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-800/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-700/"] {
+  color: rgb(var(--ui-text-rgb)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-600"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-500"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class~="text-slate-400"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-600/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-500/"],
+:is(.olive:not(.dark), .hunting:not(.dark)) [class*="text-slate-400/"] {
+  color: rgb(var(--ui-muted-rgb)) !important;
+}
+:is(.dark.olive, .dark.hunting) [class~="text-slate-50"],
+:is(.dark.olive, .dark.hunting) [class~="text-slate-100"],
+:is(.dark.olive, .dark.hunting) [class~="text-slate-200"],
+:is(.dark.olive, .dark.hunting) [class~="text-slate-300"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-50/"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-100/"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-200/"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-300/"] {
+  color: rgb(var(--ui-text-rgb)) !important;
+}
+:is(.dark.olive, .dark.hunting) [class~="text-slate-400"],
+:is(.dark.olive, .dark.hunting) [class~="text-slate-500"],
+:is(.dark.olive, .dark.hunting) [class~="text-slate-600"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-400/"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-500/"],
+:is(.dark.olive, .dark.hunting) [class*="text-slate-600/"] {
+  color: rgb(var(--ui-muted-rgb)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="placeholder-slate-"]::placeholder {
+  color: rgb(var(--ui-muted-rgb)) !important;
+}
+
+/* Semantic accent, warm, and info families stay inside the active palette.
+   Score colors are inline styles, so they are intentionally untouched. */
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-emerald-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-green-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-lime-"] {
+  color: rgb(var(--ui-accent-text-rgb)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-emerald-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-green-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-lime-"] {
+  background-color: rgb(var(--ui-accent-rgb) / var(--card-opacity, 0.92)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-emerald-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-green-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-lime-"] {
+  border-color: rgb(var(--ui-accent-rgb) / 0.7) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-emerald-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-green-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-lime-"] {
+  --tw-ring-color: rgb(var(--ui-accent-rgb) / 0.65) !important;
+}
+
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-amber-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-orange-"] {
+  color: rgb(var(--ui-warm-text-rgb)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-amber-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-orange-"] {
+  background-color: rgb(var(--ui-warm-rgb) / var(--card-opacity, 0.92)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-amber-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-orange-"] {
+  border-color: rgb(var(--ui-warm-rgb) / 0.7) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-amber-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-orange-"] {
+  --tw-ring-color: rgb(var(--ui-warm-rgb) / 0.65) !important;
+}
+
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-sky-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="text-blue-"] {
+  color: rgb(var(--ui-info-text-rgb)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-sky-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="bg-blue-"] {
+  background-color: rgb(var(--ui-info-rgb) / var(--card-opacity, 0.92)) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-sky-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="border-blue-"] {
+  border-color: rgb(var(--ui-info-rgb) / 0.7) !important;
+}
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-sky-"],
+:is(.olive:not(.dark), .hunting:not(.dark), .dark.olive, .dark.hunting) [class*="ring-blue-"] {
+  --tw-ring-color: rgb(var(--ui-info-rgb) / 0.65) !important;
+}
+
 /* Keep the dark Hunter mobile navigation in the same flat, single-surface
    style as the other themes. The global Hunter color rules otherwise turn
    each active utility into an opaque tab-sized block. */
 .dark.hunting [data-bottom-nav] {
-  background-color: rgb(2 6 23 / 0.96) !important;
-  border-top-color: rgba(30, 41, 59, 0.6) !important;
-  color: #f1f5f9 !important;
+  background-color: rgb(var(--ui-surface-rgb) / 0.96) !important;
+  border-top-color: rgb(var(--ui-border-rgb) / 0.7) !important;
+  color: rgb(var(--ui-text-rgb)) !important;
 }
 .dark.hunting [data-bottom-nav] > button {
   border: 0 !important;
   box-shadow: none !important;
 }
 .dark.hunting [data-bottom-nav] > button[class*="bg-emerald-"] {
-  background-color: rgb(85 107 47 / 0.18) !important;
-  color: #d8c8a8 !important;
+  background-color: rgb(var(--ui-accent-rgb) / 0.18) !important;
+  color: rgb(var(--ui-accent-text-rgb)) !important;
 }
 .dark.hunting [data-bottom-nav] > button[class*="bg-amber-"] {
-  background-color: rgb(245 158 11 / 0.1) !important;
-  color: #fbbf24 !important;
+  background-color: rgb(var(--ui-warm-rgb) / 0.1) !important;
+  color: rgb(var(--ui-warm-text-rgb)) !important;
 }
 .dark.hunting [data-bottom-nav] > button[class*="bg-sky-"] {
-  background-color: rgb(14 165 233 / 0.1) !important;
-  color: #38bdf8 !important;
+  background-color: rgb(var(--ui-info-rgb) / 0.1) !important;
+  color: rgb(var(--ui-info-text-rgb)) !important;
 }
 
 /* =====================================================================
@@ -1135,6 +1401,6 @@ rect:focus {
   .sm\:rounded-2xl { border-radius: 1rem; }
 }
 .dark.hunting [data-bottom-nav] > button[class*="bg-slate-"] {
-  background-color: rgba(51, 65, 85, 0.4) !important;
-  color: #e2e8f0 !important;
+  background-color: rgb(var(--ui-surface-soft-rgb) / 0.6) !important;
+  color: rgb(var(--ui-text-rgb)) !important;
 }

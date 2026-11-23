@@ -63,11 +63,11 @@ interface LogsAndStatsViewProps {
 }
 
 const GENDER_COLORS: Record<string, string> = {
-  Buck: '#10b981', // Emerald
-  Doe: '#3b82f6', // Blue
-  'Button Buck': '#f59e0b', // Amber
-  'Shed Buck': '#a855f7', // Purple
-  Other: '#64748b', // Slate
+  Buck: 'rgb(var(--ui-accent-rgb))',
+  Doe: 'rgb(var(--ui-info-rgb))',
+  'Button Buck': 'rgb(var(--ui-warm-rgb))',
+  'Shed Buck': 'rgb(var(--ui-accent-rgb) / 0.65)',
+  Other: 'rgb(var(--ui-muted-rgb))',
 };
 
 const AGE_OPTIONS = [
@@ -851,13 +851,13 @@ const cardBgLight = hasCustomBackground
               <div className="h-64 sm:h-72 w-full mt-2 outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={timeDistributionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }}
+                      tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }}
                       interval={1}
                     />
-                    <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }} allowDecimals={false} />
+                    <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }} allowDecimals={false} />
                     <Tooltip
                       cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' }}
                       wrapperStyle={{ outline: 'none' }}
@@ -1013,9 +1013,9 @@ const cardBgLight = hasCustomBackground
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                    <XAxis dataKey="month" tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 11 }} />
-                    <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 11 }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
+                    <XAxis dataKey="month" tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 11 }} />
+                    <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 11 }} allowDecimals={false} />
                     <Tooltip
                       cursor={{ stroke: '#10b981', strokeWidth: 1, strokeDasharray: '3 3' }}
                       wrapperStyle={{ outline: 'none' }}
@@ -1083,12 +1083,12 @@ const cardBgLight = hasCustomBackground
                     data={standRankingData}
                     margin={{ top: 0, right: 20, left: 30, bottom: 0 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                    <XAxis type="number" tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 11 }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
+                    <XAxis type="number" tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 11 }} allowDecimals={false} />
                     <YAxis
                       dataKey="stand"
                       type="category"
-                      tick={{ fill: isDark ? '#cbd5e1' : '#334155', fontSize: 10, fontWeight: 700 }}
+                      tick={{ fill: 'rgb(var(--ui-text-rgb))', fontSize: 10, fontWeight: 700 }}
                       width={100}
                     />
                     <Tooltip
@@ -1157,14 +1157,14 @@ const cardBgLight = hasCustomBackground
                 {specificDateChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={specificDateChartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
                       <XAxis
                         dataKey="monthDay"
-                        tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 700 }}
+                        tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10, fontWeight: 700 }}
                         angle={-25}
                         textAnchor="end"
                       />
-                      <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }} allowDecimals={false} />
+                      <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }} allowDecimals={false} />
                       <Tooltip
                         cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' }}
                         wrapperStyle={{ outline: 'none' }}
@@ -1238,9 +1238,9 @@ const cardBgLight = hasCustomBackground
               <div className="h-64 w-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={temperatureChartData.brackets} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                    <XAxis dataKey="label" tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 700 }} />
-                    <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
+                    <XAxis dataKey="label" tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10, fontWeight: 700 }} />
+                    <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }} allowDecimals={false} />
                     <Tooltip
                       cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' }}
                       wrapperStyle={{ outline: 'none' }}
@@ -1306,9 +1306,9 @@ const cardBgLight = hasCustomBackground
               <div className="h-60 w-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={windAnalyticsData.speedBrackets} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                    <XAxis dataKey="label" tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10, fontWeight: 700 }} />
-                    <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
+                    <XAxis dataKey="label" tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10, fontWeight: 700 }} />
+                    <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }} allowDecimals={false} />
                     <Tooltip
                       cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' }}
                       wrapperStyle={{ outline: 'none' }}
@@ -1360,9 +1360,9 @@ const cardBgLight = hasCustomBackground
               <div className="h-60 w-full outline-none focus:outline-none [&_*]:outline-none [&_*]:focus:outline-none">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={windAnalyticsData.dirData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.5} />
-                    <XAxis dataKey="direction" tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 11, fontWeight: 800 }} />
-                    <YAxis tick={{ fill: isDark ? '#94a3b8' : '#64748b', fontSize: 10 }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--ui-border-rgb) / 0.8)" opacity={0.5} />
+                    <XAxis dataKey="direction" tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 11, fontWeight: 800 }} />
+                    <YAxis tick={{ fill: 'rgb(var(--ui-muted-rgb))', fontSize: 10 }} allowDecimals={false} />
                     <Tooltip
                       cursor={{ fill: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)' }}
                       wrapperStyle={{ outline: 'none' }}
